@@ -6,6 +6,7 @@ Replaces the old where_are_you_now generator with cleaner data extraction
 
 from typing import Dict, Any, Optional
 from datetime import datetime
+import re
 
 
 def extract_personal_information(combined_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -23,13 +24,33 @@ def extract_personal_information(combined_data: Dict[str, Any]) -> Dict[str, Any
         """Safely get a field value with a default"""
         return data.get(field, default) if data else default
 
+    def truthy(x) -> bool:
+        """Robust detection of yes/true/checked values"""
+        if isinstance(x, bool):
+            return x
+        s = str(x or "").strip().lower()
+        return s in {"yes", "true", "1", "on", "checked", "x"}
+
+    def hours_to_status(is_self_employed: bool, hours_value: str) -> str:
+        """Parse hours string (like '35+ hours') and determine employment status"""
+        if is_self_employed:
+            return "Self-Employed"
+        m = re.search(r"(\d+(\.\d+)?)", str(hours_value or ""))
+        if m:
+            h = float(m.group(1))
+            if h >= 30:
+                return "Fulltime"
+            if h > 0:
+                return "Part-time"
+        return "Fulltime"  # safe default
+
     def calculate_age(dob_string: str) -> int:
         """Calculate age from date of birth string, return integer"""
         if not dob_string or dob_string == "":
             return 0
         try:
-            # Handle various date formats (MM/DD/YYYY or YYYY-MM-DD)
-            for fmt in ["%m/%d/%Y", "%Y-%m-%d", "%d/%m/%Y"]:
+            # Handle various date formats including WordPress/ISO formats
+            for fmt in ["%m/%d/%Y", "%Y-%m-%d", "%d/%m/%Y", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S"]:
                 try:
                     dob = datetime.strptime(dob_string, fmt)
                     today = datetime.now()
@@ -42,15 +63,17 @@ def extract_personal_information(combined_data: Dict[str, Any]) -> Dict[str, Any
             return 0
 
     def clean_salary_to_int(value: Any) -> int:
-        """Clean salary and convert to integer NZD (no decimals)"""
+        """Clean salary and convert to integer NZD (no decimals), clamping negatives to 0"""
         if not value or value == "":
             return 0
         if isinstance(value, (int, float)):
-            return int(value)  # Floor decimals
+            n = int(value)
+            return n if n > 0 else 0
         # Remove $, commas, and convert to int
         cleaned = str(value).replace('$', '').replace(',', '').strip()
         try:
-            return int(float(cleaned))  # Convert to float first then int to handle decimals
+            n = int(float(cleaned))  # Convert to float first then int to handle decimals
+            return n if n > 0 else 0
         except:
             return 0
 
@@ -90,21 +113,29 @@ def extract_personal_information(combined_data: Dict[str, Any]) -> Dict[str, Any
     # Initialize household array
     people = []
 
-    # Extract main contact information
-    main_name_first = safe_get(combined_data, "144", safe_get(combined_data, "3", ""))
+    # Extract main contact information (no email fallback - field 3 is email)
+    main_name_first = (
+        safe_get(combined_data, "144")
+        or safe_get(combined_data, "first_name")
+        or safe_get(combined_data, "client_first_name")
+        or ""
+    )
     main_name_last = safe_get(combined_data, "145", "")
     main_full_name = f"{main_name_first} {main_name_last}".strip()
 
     # Use first name as label, or "Client" if missing
     main_label = main_name_first if main_name_first else "Client"
 
-    # Check if self-employed
-    main_is_self_employed = safe_get(combined_data, "276") in ["Yes", "true", "1", True]
+    # Check if self-employed using truthy helper
+    main_is_self_employed = truthy(safe_get(combined_data, "276"))
     main_employer = safe_get(combined_data, "277", "")
 
-    # If self-employed flag is set or no employer specified, set employer to "Self-Employed"
-    if main_is_self_employed or not main_employer:
+    # Only set employer to "Self-Employed" when flag is actually true
+    if main_is_self_employed:
         main_employer = "Self-Employed"
+
+    # Get hours for status calculation
+    main_hours = safe_get(combined_data, "275", "")
 
     # Build main person object
     main_person = {
@@ -113,30 +144,39 @@ def extract_personal_information(combined_data: Dict[str, Any]) -> Dict[str, Any
         "occupation": safe_get(combined_data, "6", ""),
         "employer": main_employer,
         "salary_before_tax_nzd": clean_salary_to_int(safe_get(combined_data, "10", 0)),
-        "employment_status": get_employment_status(main_is_self_employed, "275", combined_data),
+        "employment_status": hours_to_status(main_is_self_employed, main_hours),
         "will_epa_status": get_will_status(safe_get(combined_data, "26", ""))
     }
 
     people.append(main_person)
 
-    # Check if this is a couple
+    # Check if this is a couple (case-insensitive and robust)
     partner_name_first = safe_get(combined_data, "146", "")
     partner_name_last = safe_get(combined_data, "147", "")
     partner_full_name = f"{partner_name_first} {partner_name_last}".strip()
-    is_couple = bool(partner_full_name) or safe_get(combined_data, "39") == "couple" or safe_get(combined_data, "8") == "My partner and I"
+
+    couple_hint = (str(safe_get(combined_data, "39") or safe_get(combined_data, "8") or "")).strip().lower()
+    is_couple = (
+        bool(partner_name_first or partner_name_last)
+        or truthy(safe_get(combined_data, "is_couple"))
+        or couple_hint in {"couple", "my partner and i", "partner", "joint"}
+    )
 
     # Add partner if couple
     if is_couple:
         # Use first name as label, or "Partner" if missing
         partner_label = partner_name_first if partner_name_first else "Partner"
 
-        # Check if partner is self-employed
-        partner_is_self_employed = safe_get(combined_data, "483") in ["Yes", "true", "1", True]
+        # Check if partner is self-employed using truthy helper
+        partner_is_self_employed = truthy(safe_get(combined_data, "483"))
         partner_employer = safe_get(combined_data, "297", safe_get(combined_data, "288", ""))
 
-        # If self-employed flag is set or no employer specified, set employer to "Self-Employed"
-        if partner_is_self_employed or not partner_employer:
+        # Only set employer to "Self-Employed" when flag is actually true
+        if partner_is_self_employed:
             partner_employer = "Self-Employed"
+
+        # Get partner hours for status calculation
+        partner_hours = safe_get(combined_data, "295", "")
 
         partner_person = {
             "label": partner_label,
@@ -144,7 +184,7 @@ def extract_personal_information(combined_data: Dict[str, Any]) -> Dict[str, Any
             "occupation": safe_get(combined_data, "40", safe_get(combined_data, "286", "")),
             "employer": partner_employer,
             "salary_before_tax_nzd": clean_salary_to_int(safe_get(combined_data, "42", safe_get(combined_data, "296", 0))),
-            "employment_status": get_employment_status(partner_is_self_employed, "295", combined_data),
+            "employment_status": hours_to_status(partner_is_self_employed, partner_hours),
             "will_epa_status": get_will_status(safe_get(combined_data, "300", ""))
         }
 
@@ -162,7 +202,8 @@ def extract_personal_information(combined_data: Dict[str, Any]) -> Dict[str, Any
         },
         "constraints": {
             "max_chars": 360
-        }
+        },
+        "status": "success"
     }
 
     return result
