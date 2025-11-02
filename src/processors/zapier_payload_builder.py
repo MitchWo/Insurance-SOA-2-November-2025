@@ -55,7 +55,6 @@ class ZapierPayloadBuilder:
             # === JSON STRING FIELDS (one field per section - no nested objects!) ===
             "scope_of_advice_json": self._build_section_json(combined_report.get('scope_of_advice', {})),
             "personal_information_json": self._build_section_json(combined_report.get('personal_information', {})),
-            "assets_liabilities_json": self._build_section_json(combined_report.get('assets_liabilities', {})),
             "life_insurance_json": self._build_section_json(combined_report.get('life_insurance', {})),
             "trauma_insurance_json": self._build_section_json(combined_report.get('trauma_insurance', {})),
             "income_protection_json": self._build_section_json(combined_report.get('income_protection', {})),
@@ -136,7 +135,7 @@ class ZapierPayloadBuilder:
 
         # Check required JSON fields
         required_json_fields = [
-            'scope_of_advice_json', 'personal_information_json', 'assets_liabilities_json',
+            'scope_of_advice_json', 'personal_information_json',
             'life_insurance_json', 'trauma_insurance_json', 'income_protection_json',
             'health_insurance_json', 'accidental_injury_json'
         ]
@@ -174,7 +173,7 @@ class ZapierPayloadBuilder:
         ]
 
         json_sections = [
-            'scope_of_advice_json', 'personal_information_json', 'assets_liabilities_json',
+            'scope_of_advice_json', 'personal_information_json',
             'life_insurance_json', 'trauma_insurance_json', 'income_protection_json',
             'health_insurance_json', 'accidental_injury_json'
         ]

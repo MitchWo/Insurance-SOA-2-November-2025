@@ -19,7 +19,6 @@ from processors.form_matcher import FormMatcher
 from processors.insurance_workflow import InsuranceWorkflow
 from processors.scope_of_advice_generator import generate_scope_of_advice_json
 from processors.personal_information_extractor import extract_personal_information
-from processors.assets_liabilities_extractor import extract_assets_liabilities
 from processors.life_insurance_extractor import extract_life_insurance, extract_trauma_insurance
 from generators.life_insurance_fields import extract_life_insurance_fields
 from generators.trauma_insurance_fields import extract_trauma_insurance_fields
@@ -411,32 +410,6 @@ def generate_personal_information():
         return jsonify({'error': str(e)}), 500
 
 
-@app.route('/generate/assets-liabilities', methods=['POST'])
-def generate_assets_liabilities():
-    """
-    Extract assets and liabilities in simple table format
-    Zapier-compatible endpoint for direct data extraction
-    """
-    try:
-        data = request.json
-
-        # Extract assets and liabilities
-        result = extract_assets_liabilities(data)
-
-        # Return the structured data directly
-        response = {
-            'status': 'success',
-            **result  # Include all fields from assets_liabilities
-        }
-
-        print(f"✓ Extracted Assets and Liabilities")
-        return jsonify(response), 200
-
-    except Exception as e:
-        print(f"✗ Error extracting Assets and Liabilities: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-
 @app.route('/generate/combined-report', methods=['POST'])
 def generate_combined_report():
     """
@@ -463,9 +436,6 @@ def generate_combined_report():
 
         # Extract personal information
         personal_info = extract_personal_information(data)
-
-        # Extract assets and liabilities
-        assets_liabilities = extract_assets_liabilities(data)
 
         # Generate life insurance fields
         life_insurance_fields = extract_life_insurance_fields(data)
@@ -496,7 +466,6 @@ def generate_combined_report():
                 }
             },
             'personal_information': personal_info,
-            'assets_liabilities': assets_liabilities,
             'life_insurance': life_insurance_fields,
             'trauma_insurance': trauma_insurance_fields,
             'income_protection': income_protection_fields,

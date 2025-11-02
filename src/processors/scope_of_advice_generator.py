@@ -190,10 +190,13 @@ class ScopeOfAdviceGenerator:
 
         if isinstance(value, str):
             value_lower = value.lower().strip()
-            # Check for explicit checkbox markers
+            # Check for explicit TRUE checkbox markers
             if value_lower in ['yes', 'true', '1', 'checked', 'on', 'x']:
                 return True
-            # If it's a non-empty string and not empty, treat as selected
+            # Check for explicit FALSE checkbox markers
+            if value_lower in ['no', 'false', '0', 'unchecked', 'off']:
+                return False
+            # If it's a non-empty string not in the above lists, treat as selected
             # (covers cases where form stores product names or descriptions in checkbox fields)
             return len(value_lower) > 0
 
@@ -308,7 +311,7 @@ class ScopeOfAdviceGenerator:
         elif not out_of_scope:
             return f"This Statement of Advice provides comprehensive insurance recommendations for {client_ref} covering all major risk areas including life, income protection, trauma, health, TPD, and ACC top-up insurance. Our analysis indicates that full coverage across all product categories is appropriate."
         else:
-            scope_str = ", ".join(in_scope[:3]) + ("..." if len(in_scope) > 3 else "")
+            scope_str = ", ".join(in_scope)
             return f"This advice focuses on {len(in_scope)} insurance product(s) for {client_ref}: {scope_str}. The scope has been tailored based on specific needs, existing coverage, and identified circumstances that limit the requirement for certain insurance types."
 
     @classmethod
@@ -339,12 +342,10 @@ class ScopeOfAdviceGenerator:
         if not active_limitations:
             return "No specific limitations have been identified that restrict the scope of insurance advice."
 
-        limitations_text = "; ".join([lim['description'] for lim in active_limitations[:3]])
-        if len(active_limitations) > 3:
-            limitations_text += f" and {len(active_limitations) - 3} other factor(s)"
+        limitations_text = "; ".join([lim['description'] for lim in active_limitations])
 
         if limitation_notes:
-            limitations_text += f". Additional notes: {limitation_notes[:100]}"
+            limitations_text += f". Additional notes: {limitation_notes}"
 
         return f"Scope limitations: {limitations_text}"
 
@@ -387,7 +388,7 @@ class ScopeOfAdviceGenerator:
         if not priorities:
             priorities = ["obtain appropriate insurance coverage", "balance protection with affordability"]
 
-        priority_text = "; ".join(priorities[:4])
+        priority_text = "; ".join(priorities)
         return f"Client priorities identified: {priority_text}"
 
     @classmethod
@@ -413,7 +414,7 @@ class ScopeOfAdviceGenerator:
             exclusions.append("death benefit for beneficiaries")
 
         if exclusions:
-            return f"Not covered under this advice: {'; '.join(exclusions[:3])}. Clients should consider self-insurance or alternative arrangements for these risks."
+            return f"Not covered under this advice: {'; '.join(exclusions)}. Clients should consider self-insurance or alternative arrangements for these risks."
 
         return "Products outside the agreed scope are not covered. Policy-specific exclusions will apply to recommended products."
 
@@ -430,7 +431,7 @@ class ScopeOfAdviceGenerator:
             "Implement accepted coverage"
         ]
 
-        return f"Next steps: {'; '.join(steps[:3])}. Adviser will guide through application process."
+        return f"Next steps: {'; '.join(steps)}. Adviser will guide through application process."
 
     @classmethod
     def _generate_disclosures_content(cls) -> str:

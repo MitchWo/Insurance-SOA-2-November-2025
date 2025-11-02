@@ -71,8 +71,8 @@ class ZapierTrigger:
                         items.append((f"{parent_key}{sep}products_out_of_scope", v['out_of_scope']))
                 continue
 
-            # For personal_information and assets_liabilities, create table format
-            if k in ['personal_information', 'assets_liabilities']:
+            # For personal_information, create table format
+            if k in ['personal_information']:
                 if isinstance(v, dict):
                     # Create a flat table representation
                     table_data = []

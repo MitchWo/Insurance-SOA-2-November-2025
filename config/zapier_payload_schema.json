@@ -49,10 +49,6 @@
       "type": "object",
       "description": "Personal and employment information"
     },
-    "assets_liabilities": {
-      "type": "object",
-      "description": "Financial assets and liabilities"
-    },
     "life_insurance": {
       "type": "object",
       "description": "Life insurance needs and coverage"

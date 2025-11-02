@@ -40,7 +40,7 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
 
     # Get both forms data - use raw data if available for extractors
     # First try to get the raw form data which has flat field structure
-    # The extractors (personal_information, assets_liabilities, etc) expect flat field numbers
+    # The extractors (personal_information, etc) expect flat field numbers
     # like "144", "94", "380", etc., not the nested model structure
 
     # Try to load raw form data from files if available
@@ -88,7 +88,6 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
         from generators.accidental_injury_fields import extract_accidental_injury_fields
         from processors.scope_of_advice_generator import generate_scope_of_advice_json
         from processors.personal_information_extractor import extract_personal_information
-        from processors.assets_liabilities_extractor import extract_assets_liabilities
 
         # Determine client info
         client_name = combined_data.get('client_name', combined_data.get('3', 'the client'))
@@ -104,7 +103,6 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
         # Generate scope and personal information
         scope_result = generate_scope_of_advice_json(combined_data, client_name=client_name, is_couple=is_couple)
         personal_info = extract_personal_information(combined_data)
-        assets_liabilities = extract_assets_liabilities(combined_data)
 
         # Create combined report
         combined_report = {
@@ -115,7 +113,6 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
             'match_confidence': match_result.confidence,
             'scope_of_advice': scope_result,
             'personal_information': personal_info,
-            'assets_liabilities': assets_liabilities,
             'life_insurance': life_insurance,
             'trauma_insurance': trauma_insurance,
             'income_protection': income_protection,
