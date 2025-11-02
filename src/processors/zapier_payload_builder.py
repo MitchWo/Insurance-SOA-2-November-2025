@@ -42,9 +42,9 @@ class ZapierPayloadBuilder:
         case_id = combined_report.get('case_id', '')
         is_couple = combined_report.get('is_couple', False)
 
-        # Build the standardized payload
+        # Build the standardized payload - ONLY simple fields + JSON strings for Zapier
         payload = {
-            # === CORE IDENTIFICATION ===
+            # === CORE IDENTIFICATION (simple fields) ===
             "client_email": client_email,
             "client_name": client_name,
             "partner_name": combined_report.get('partner_name', None),
@@ -52,93 +52,10 @@ class ZapierPayloadBuilder:
             "is_couple": is_couple,
             "match_confidence": combined_report.get('match_confidence', 0.0),
 
-            # === SCOPE OF ADVICE ===
-            "scope_of_advice": self._ensure_section(
-                combined_report.get('scope_of_advice', {}),
-                {
-                    "status": "not_generated",
-                    "products_in_scope": [],
-                    "products_out_of_scope": [],
-                    "limitations": ""
-                }
-            ),
-
-            # === PERSONAL INFORMATION ===
-            "personal_information": self._ensure_section(
-                combined_report.get('personal_information', {}),
-                {
-                    "status": "not_generated",
-                    "household": {"people": []}
-                }
-            ),
-
-            # === ASSETS & LIABILITIES ===
-            "assets_liabilities": self._ensure_section(
-                combined_report.get('assets_liabilities', {}),
-                {
-                    "status": "not_generated",
-                    "total_assets": 0,
-                    "total_liabilities": 0,
-                    "net_worth": 0
-                }
-            ),
-
-            # === ASSETS & LIABILITIES JSON (single field for Zapier mapping) ===
-            "assets_liabilities_json": self._build_assets_liabilities_json(
-                combined_report.get('assets_liabilities', {})
-            ),
-
-            # === LIFE INSURANCE ===
-            "life_insurance": self._ensure_section(
-                combined_report.get('life_insurance', {}),
-                {
-                    "status": "not_generated",
-                    "needs_analysis": {},
-                    "coverage": {}
-                }
-            ),
-
-            # === TRAUMA INSURANCE ===
-            "trauma_insurance": self._ensure_section(
-                combined_report.get('trauma_insurance', {}),
-                {
-                    "status": "not_generated",
-                    "needs_analysis": {},
-                    "coverage": {}
-                }
-            ),
-
-            # === INCOME PROTECTION ===
-            "income_protection": self._ensure_section(
-                combined_report.get('income_protection', {}),
-                {
-                    "status": "not_generated",
-                    "needs_analysis": {},
-                    "coverage": {}
-                }
-            ),
-
-            # === HEALTH INSURANCE ===
-            "health_insurance": self._ensure_section(
-                combined_report.get('health_insurance', {}),
-                {
-                    "status": "not_generated",
-                    "needs_analysis": {},
-                    "coverage": {}
-                }
-            ),
-
-            # === ACCIDENTAL INJURY / ACC ===
-            "accidental_injury": self._ensure_section(
-                combined_report.get('accidental_injury', {}),
-                {
-                    "status": "not_generated",
-                    "needs_analysis": {},
-                    "coverage": {}
-                }
-            ),
-
-            # === INSURANCE JSON FIELDS (single field per section for easy Zapier mapping) ===
+            # === JSON STRING FIELDS (one field per section - no nested objects!) ===
+            "scope_of_advice_json": self._build_section_json(combined_report.get('scope_of_advice', {})),
+            "personal_information_json": self._build_section_json(combined_report.get('personal_information', {})),
+            "assets_liabilities_json": self._build_section_json(combined_report.get('assets_liabilities', {})),
             "life_insurance_json": self._build_section_json(combined_report.get('life_insurance', {})),
             "trauma_insurance_json": self._build_section_json(combined_report.get('trauma_insurance', {})),
             "income_protection_json": self._build_section_json(combined_report.get('income_protection', {})),
@@ -148,7 +65,7 @@ class ZapierPayloadBuilder:
             # === METADATA ===
             "timestamp": datetime.now().isoformat(),
             "source": "Insurance-SOA-System",
-            "payload_version": "1.0"
+            "payload_version": "1.1"
         }
 
         return payload
@@ -176,26 +93,6 @@ class ZapierPayloadBuilder:
 
         return section_data
 
-    def _build_assets_liabilities_json(self, assets_data: Dict[str, Any]) -> str:
-        """
-        Build a single JSON string field containing all assets & liabilities data
-        for easy Zapier mapping (one field instead of many nested objects)
-
-        Args:
-            assets_data: The assets_liabilities data from combined report
-
-        Returns:
-            JSON string containing all data, or empty object string if not generated
-        """
-        if not isinstance(assets_data, dict) or not assets_data:
-            return json.dumps({
-                "status": "not_generated",
-                "message": "Assets & liabilities data not yet generated"
-            })
-
-        # If data exists, return it as a JSON string
-        return json.dumps(assets_data, indent=2)
-
     def _build_section_json(self, section_data: Dict[str, Any]) -> str:
         """
         Build a single JSON string field for any insurance section
@@ -218,7 +115,7 @@ class ZapierPayloadBuilder:
 
     def validate_payload(self, payload: Dict[str, Any]) -> tuple[bool, list]:
         """
-        Validate that payload matches the schema
+        Validate that payload matches the schema (simplified for JSON-only structure)
 
         Args:
             payload: The payload to validate
@@ -228,17 +125,27 @@ class ZapierPayloadBuilder:
         """
         errors = []
 
-        # Check required fields
+        # Check required simple fields
         required_fields = [
-            'client_email', 'client_name', 'case_id', 'is_couple',
-            'scope_of_advice', 'personal_information', 'life_insurance',
-            'trauma_insurance', 'income_protection', 'health_insurance',
-            'accidental_injury'
+            'client_email', 'client_name', 'case_id', 'is_couple'
         ]
 
         for field in required_fields:
             if field not in payload:
                 errors.append(f"Missing required field: {field}")
+
+        # Check required JSON fields
+        required_json_fields = [
+            'scope_of_advice_json', 'personal_information_json', 'assets_liabilities_json',
+            'life_insurance_json', 'trauma_insurance_json', 'income_protection_json',
+            'health_insurance_json', 'accidental_injury_json'
+        ]
+
+        for field in required_json_fields:
+            if field not in payload:
+                errors.append(f"Missing required JSON field: {field}")
+            elif not isinstance(payload.get(field), str):
+                errors.append(f"Field '{field}' must be a JSON string")
 
         # Check types
         if 'is_couple' in payload and not isinstance(payload['is_couple'], bool):
@@ -247,22 +154,11 @@ class ZapierPayloadBuilder:
         if 'match_confidence' in payload and not isinstance(payload['match_confidence'], (int, float)):
             errors.append("Field 'match_confidence' must be number")
 
-        # Check that all insurance sections are dicts
-        insurance_sections = [
-            'scope_of_advice', 'personal_information', 'assets_liabilities',
-            'life_insurance', 'trauma_insurance', 'income_protection',
-            'health_insurance', 'accidental_injury'
-        ]
-
-        for section in insurance_sections:
-            if section in payload and not isinstance(payload[section], dict):
-                errors.append(f"Field '{section}' must be object/dict")
-
         return (len(errors) == 0, errors)
 
     def get_payload_summary(self, payload: Dict[str, Any]) -> str:
         """
-        Get a human-readable summary of the payload
+        Get a human-readable summary of the payload (JSON-field version)
 
         Args:
             payload: The payload to summarize
@@ -274,19 +170,27 @@ class ZapierPayloadBuilder:
             f"Client: {payload.get('client_name')} ({payload.get('client_email')})",
             f"Case ID: {payload.get('case_id')}",
             f"Couple: {'Yes' if payload.get('is_couple') else 'No'}",
-            f"Sections included:"
+            f"JSON Fields included:"
         ]
 
-        sections = [
-            'scope_of_advice', 'personal_information', 'assets_liabilities',
-            'life_insurance', 'trauma_insurance', 'income_protection',
-            'health_insurance', 'accidental_injury'
+        json_sections = [
+            'scope_of_advice_json', 'personal_information_json', 'assets_liabilities_json',
+            'life_insurance_json', 'trauma_insurance_json', 'income_protection_json',
+            'health_insurance_json', 'accidental_injury_json'
         ]
 
-        for section in sections:
-            data = payload.get(section, {})
-            status = data.get('status', 'missing') if isinstance(data, dict) else 'invalid'
-            summary_lines.append(f"  - {section}: {status}")
+        for section in json_sections:
+            json_data = payload.get(section, '')
+            if json_data:
+                # Try to parse status from JSON
+                try:
+                    data = json.loads(json_data)
+                    status = data.get('status', 'present')
+                except:
+                    status = 'present'
+            else:
+                status = 'missing'
+            summary_lines.append(f"  - {section}: {status} ({len(json_data)} chars)")
 
         return "\n".join(summary_lines)
 
