@@ -1,0 +1,13 @@
+{
+  "zapier_webhook_url": "https://hooks.zapier.com/hooks/catch/12679562/urq5tjh/",
+  "enabled": true,
+  "trigger_on_match": true,
+  "include_all_fields": true,
+  "retry_attempts": 3,
+  "retry_delay_seconds": 5,
+  "timeout_seconds": 30,
+  "headers": {
+    "Content-Type": "application/json",
+    "X-Source": "Insurance-SOA-System"
+  }
+}
