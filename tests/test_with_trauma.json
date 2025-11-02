@@ -1,0 +1,22 @@
+{
+  "client_name": "Test Client",
+  "is_couple": false,
+  "email": "test@example.com",
+
+  "scope_life": true,
+  "scope_trauma": true,
+
+  "380": "400000",
+  "381": "200000",
+  "386": "100000",
+  "388": "45000",
+
+  "402": "50000",
+  "486": "30000",
+  "403": "100000",
+  "404": "50000",
+  "405": "20000",
+
+  "income": 85000,
+  "expenses": 60000
+}

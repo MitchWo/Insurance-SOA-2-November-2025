@@ -1,0 +1,80 @@
+# Insurance Automation Form Field Mappings
+# Form ID: 124
+# This form handles the recommendation and advice stage after fact finding
+
+# Client Details
+client_details:
+  email: [3]
+  is_couple: [39]  # Determines if advice is for single or couple
+
+# Scope of Advice - What insurance types are being recommended
+scope_of_advice:
+  scope_items: [5]  # Main checkbox field
+  life_insurance: [5.1]
+  income_protection: [5.2]
+  trauma_cover: [5.3]
+  health_insurance: [5.4]
+  total_permanent_disability: [5.5]
+  acc: [5.6]
+
+# Limitations - Reasons for limiting scope of advice
+limitations:
+  limitation_reasons: [6]  # Main checkbox field
+  employer_medical: [6.1]  # Medical cover through employer
+  no_debt_strong_assets: [6.2]  # Life cover not required due to no debt and strong asset base
+  budget_limitations: [6.3]  # Budget limitations
+  self_insure: [6.4]  # Client can self-insure the risk
+  no_dependants: [6.5]  # As client has no dependants
+  uninsurable_occupation: [6.6]  # Not insurable occupation
+  other: [6.7]  # Other reasons
+  limitation_notes: [7]  # Text field for additional limitation details
+
+# Main Contact - Existing Cover Details
+main_existing_cover:
+  policy_documents: [10]  # Upload field for existing policy documents
+  life_amount: [11]
+  life_provider: [12]
+  tpd_amount: [13]
+  tpd_provider: [14]
+  trauma_amount: [15]
+  trauma_provider: [16]
+  income_protection_amount: [17]
+  income_protection_provider: [18]
+  income_protection_periods: [19]  # Standdown/Benefit periods
+  medical_amount: [20]
+  medical_provider: [21]
+  medical_excess_addons: [22]
+  existing_premiums: [23]
+
+# Partner - Existing Cover Details (if couple)
+partner_existing_cover:
+  policy_documents: [48]  # Upload field for existing policy documents
+  life_amount: [49]
+  life_provider: [50]
+  tpd_amount: [51]
+  tpd_provider: [52]
+  trauma_amount: [53]
+  trauma_provider: [54]
+  income_protection_amount: [55]
+  income_protection_provider: [56]
+  income_protection_periods: [57]  # Standdown/Benefit periods
+  medical_amount: [58]
+  medical_provider: [59]
+  medical_excess_addons: [60]
+  existing_premiums: [61]
+
+# Recommendation - Provider quotes and selection
+recommendation:
+  selected_provider: [41]  # Which provider was selected
+  quote_partners_life: [42]  # Partners Life quote amount
+  quote_fidelity_life: [43]  # Fidelity Life quote amount
+  quote_aia: [44]  # AIA quote amount
+  quote_asteron: [45]  # Asteron quote amount
+  quote_chubb: [46]  # Chubb quote amount
+  quote_nib: [47]  # nib quote amount
+
+# Additional fields that may be present
+additional:
+  adviser_notes: []  # To be populated if field exists
+  recommendation_date: []  # Will use submission timestamp
+  form_version: []  # Form version tracking

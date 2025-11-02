@@ -1,0 +1,23 @@
+{
+  "client_name": "Mitch Worthington",
+  "is_couple": false,
+  "email": "mitchwo@icloud.com",
+  "scope_life": true,
+  "scope_trauma": true,
+  "scope_income_protection": false,
+  "scope_tpd": false,
+  "scope_health": false,
+  "scope_acc": false,
+  "limitation_budget": true,
+  "limitation_no_dependants": true,
+  "limitation_notes": "Budget limitations and no dependants",
+  "income": 85000,
+  "expenses": 65000,
+  "assets": 250000,
+  "liabilities": 180000,
+  "has_life_insurance": false,
+  "has_income_protection": false,
+  "has_trauma": false,
+  "has_tpd": false,
+  "has_health": false
+}

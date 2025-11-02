@@ -1,0 +1,17 @@
+{
+  "client_name": "Test Client",
+  "is_couple": false,
+  "email": "test@example.com",
+
+  "scope_health": true,
+
+  "449": "true",
+  "450": "true",
+  "451": "false",
+  "452": "true",
+  "453": "500",
+  "454": "true",
+
+  "income": 85000,
+  "expenses": 60000
+}

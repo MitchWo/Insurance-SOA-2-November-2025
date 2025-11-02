@@ -1,0 +1,24 @@
+{
+  "client_name": "Test Client",
+  "is_couple": false,
+  "email": "test@example.com",
+
+  "scope_life": true,
+  "scope_trauma": true,
+  "scope_income_protection": false,
+  "limitation_budget": true,
+  "limitation_no_dependants": false,
+
+  "income": 85000,
+  "expenses": 60000,
+  "assets": 250000,
+  "liabilities": 180000,
+
+  "380": "400000",
+  "381": "200000",
+  "382": "50000",
+  "383": "15000",
+  "384": "10000",
+  "386": "100000",
+  "388": "45000"
+}

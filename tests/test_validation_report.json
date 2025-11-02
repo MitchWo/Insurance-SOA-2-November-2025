@@ -1,0 +1,15 @@
+{
+  "test_run": "2025-10-27T16:56:47.656515",
+  "scope_validation": {
+    "all_fields_present": true,
+    "content_within_limits": true
+  },
+  "where_validation": {
+    "all_fields_present": true,
+    "content_within_limits": true
+  },
+  "combined_stats": {
+    "total_sections": 20,
+    "total_characters": 3847
+  }
+}

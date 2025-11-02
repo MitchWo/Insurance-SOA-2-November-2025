@@ -1,0 +1,23 @@
+{
+  "client_name": "Test Client",
+  "is_couple": false,
+  "email": "test@example.com",
+
+  "scope_life": true,
+  "scope_income": true,
+
+  "420": "3000",
+  "421": "2000",
+  "422": "100000",
+  "423": "salary",
+  "424": "LOE",
+  "425": "1000",
+  "427": "10000",
+  "428": "5000",
+  "429": "4",
+  "430": "13",
+  "431": "5",
+
+  "income": 100000,
+  "expenses": 60000
+}

@@ -1,0 +1,393 @@
+# Complete Fact Find Form Field Mappings from Gravity Forms
+# Updated with all fields from the form export
+# Each field maps to a Gravity Forms field ID
+# Format: field_name: [field_id]
+
+# Admin Section
+admin:
+  case_id: [516]  # Deal ID Field
+  main_contact_email: [219]
+  partners_email: [523]
+  relationship_status: [8]  # single or couple
+  form_date: []  # Will use submission timestamp
+  adviser_name: []  # To be set separately
+
+# Client Profile Information
+client:
+  first_name: [144]  # Main Contact first name
+  last_name: [145]  # Main Contact last name
+  email: [219]  # Main Contact Email Address
+  date_of_birth: [94]
+  smoker: [220]  # Main Contact - Smoker/Vaper
+  will_in_place: [501]  # Do you have a Will & EPA
+
+# Partner Profile Information
+partner:
+  first_name: [146]  # Partners first name
+  last_name: [147]  # Partners last name
+  email: [523]  # Partners Email Address
+  date_of_birth: [95]
+  smoker: [252]  # Partner - Smoker/Vaper
+
+# Employment - Main Contact
+employment_main:
+  self_employed: [482]  # Are you Self Employed
+  occupation: [6]  # Main Contact occupation
+  hours_per_week: [275]
+  work_type: [276]
+  employer_details: [277]
+  annual_income: [10]  # Main Contact current salary
+  commissions_bonuses: [279]
+  unearned_income: [280]  # rental, dividends
+  paid_leave_weeks: [502]
+  # Self-employed specific
+  self_employed_duration: [284]  # If Self Employed – How Long?
+  number_of_staff: [285]
+  income_in_absence: [286]  # Will business still generate income
+  income_absence_duration: [287]  # how long would this continue
+  acc_coverplus_extra: [288]
+  business_debt: [289]
+  shareholding_percent: [290]
+  business_partners: [291]  # Legal Owners / Directors
+
+# Employment - Partner
+employment_partner:
+  self_employed: [483]  # Partner Self Employed
+  occupation: [40]  # Partners occupation
+  hours_per_week: [295]
+  work_type: [296]
+  employer_details: [297]
+  annual_income: [42]  # My partners current salary
+  commissions_bonuses: [299]
+  unearned_income: [300]
+  paid_leave_weeks: [503]
+  # Self-employed specific
+  self_employed_duration: [304]
+  number_of_staff: [305]
+  income_in_absence: [306]
+  income_absence_duration: [307]
+  acc_coverplus_extra: [308]
+  business_debt: [309]
+  shareholding_percent: [310]
+  business_partners: [311]
+
+# Property & Household
+household:
+  has_children: [254]  # Do you have any children
+  home_tenure: [14]  # Do you own your home or rent?
+  home_address: [84]  # Your home address (full address)
+  home_address_street: [84.1]
+  home_address_line2: [84.2]
+  home_address_city: [84.3]
+  home_address_state: [84.4]
+  home_address_postcode: [84.5]
+  home_address_country: [84.6]
+  current_house_value: [16]
+  current_mortgage: [15]
+  monthly_mortgage_repayments: [17]
+  weekly_rent: [18]
+  daily_expenses: [473]  # Day-to-Day Expenses
+
+# Children Information (up to 4 main children tracked)
+children:
+  child_1_name: [488]
+  child_1_dob: [490]
+  child_1_age: [491]
+  child_2_name: [494]
+  child_2_dob: [493]
+  child_2_age: [492]
+  child_3_name: [497]
+  child_3_dob: [496]
+  child_3_age: [495]
+  child_4_name: [500]
+  child_4_dob: [499]
+  child_4_age: [498]
+
+# Assets (up to 15 assets)
+assets:
+  asset_1_name: [33]
+  asset_1_value: [26]
+  asset_2_name: [19]
+  asset_2_value: [36]
+  asset_3_name: [35]
+  asset_3_value: [34]
+  asset_4_name: [45]
+  asset_4_value: [46]
+  asset_5_name: [47]
+  asset_5_value: [187]
+  asset_6_name: [186]
+  asset_6_value: [48]
+  asset_7_name: [198]
+  asset_7_value: [199]
+  asset_8_name: [189]
+  asset_8_value: [188]
+  asset_9_name: [192]
+  asset_9_value: [193]
+  asset_10_name: [195]
+  asset_10_value: [196]
+  asset_11_name: [201]
+  asset_11_value: [202]
+  asset_12_name: [204]
+  asset_12_value: [205]
+  asset_13_name: [207]
+  asset_13_value: [208]
+  asset_14_name: [210]
+  asset_14_value: [211]
+  asset_15_name: [213]
+  asset_15_value: [214]
+  asset_total: [466]  # Calculated total
+
+# Liabilities (up to 5 liabilities)
+liabilities:
+  liability_1_name: [71]
+  liability_1_value: [72]
+  liability_2_name: [73]
+  liability_2_value: [74]
+  liability_3_name: [75]
+  liability_3_value: [76]
+  liability_4_name: [77]
+  liability_4_value: [78]
+  liability_5_name: [88]
+  liability_5_value: [89]
+
+# Investment Properties
+investment_properties:
+  has_investment_properties: [140]
+  wants_mortgage_broker: [485]
+  # Property 1
+  property_1_address: [119]
+  property_1_value: [21]
+  property_1_mortgage: [27]
+  property_1_weekly_rent: [28]
+  # Property 2
+  property_2_address: [85]
+  property_2_value: [29]
+  property_2_mortgage: [30]
+  property_2_weekly_rent: [31]
+  # Property 3
+  property_3_address: [86]
+  property_3_value: [49]
+  property_3_mortgage: [50]
+  property_3_weekly_rent: [51]
+  # Property 4
+  property_4_address: [87]
+  property_4_value: [52]
+  property_4_mortgage: [53]
+  property_4_weekly_rent: [54]
+  # Property 5
+  property_5_address: [161]
+  property_5_value: [162]
+  property_5_mortgage: [163]
+  property_5_weekly_rent: [164]
+  # Property 6
+  property_6_address: [167]
+  property_6_value: [168]
+  property_6_mortgage: [169]
+  property_6_weekly_rent: [170]
+  # Property 7
+  property_7_address: [173]
+  property_7_value: [174]
+  property_7_mortgage: [175]
+  property_7_weekly_rent: [176]
+  # Property 8
+  property_8_address: [179]
+  property_8_value: [180]
+  property_8_mortgage: [181]
+  property_8_weekly_rent: [182]
+  # Calculated totals
+  total_property_value: [468]
+  total_property_debt: [469]
+  total_property_equity: [470]
+
+# KiwiSaver
+kiwisaver:
+  # Main Contact
+  main_provider: [60]
+  main_fund_type: [61]
+  main_balance: [62]
+  # Partner
+  partner_provider: [63]
+  partner_fund_type: [64]
+  partner_balance: [65]
+  # Additional KiwiSaver 3
+  provider_3: [215]
+  fund_type_3: [216]
+  balance_3: [217]
+
+# Medical Information - Main Client
+medical_main:
+  pre_existing_conditions: [223, 331]
+  regular_medications: [332]
+  surgeries_referrals_acc: [225, 333]
+  family_history: [334]
+  height: [512]
+  weight: [513]
+  bmi: [335]
+  gp_details: [524]
+
+# Medical Information - Partner
+medical_partner:
+  pre_existing_conditions: [224, 337]
+  regular_medications: [338]
+  surgeries_referrals_acc: [226, 339]
+  family_history: [340]
+  height: [514]
+  weight: [515]
+  bmi: [341]
+  gp_details: [525]
+
+# Existing Insurance - Main Client
+existing_insurance_main:
+  policy_documents: [464]  # Upload Policy Documents
+  life_cover_amount: [344]
+  life_cover_provider: [345]
+  tpd_amount: [346]
+  tpd_provider: [347]
+  trauma_cover_amount: [348]
+  trauma_cover_provider: [349]
+  income_protection_amount: [350]
+  income_protection_provider: [351]
+  income_protection_standdown: [352]
+  medical_insurance_amount: [353]
+  medical_insurance_provider: [354]
+  medical_insurance_excess: [355]
+  existing_premiums: [356]
+
+# Existing Insurance - Partner
+existing_insurance_partner:
+  life_cover_amount: [358]
+  life_cover_provider: [359]
+  tpd_amount: [360]
+  tpd_provider: [361]
+  trauma_cover_amount: [362]
+  trauma_cover_provider: [363]
+  income_protection_amount: [364]
+  income_protection_provider: [365]
+  income_protection_standdown: [366]
+  medical_insurance_amount: [367]
+  medical_insurance_provider: [368]
+  medical_insurance_excess: [369]
+  existing_premiums: [370]
+  loadings_exclusions: [371]
+
+# Recreational Activities
+recreational:
+  high_risk_activities: [374]
+  activity_description: [375]
+  client_priorities: [377]
+
+# Needs Analysis - Life/Terminal Illness
+needs_life_main:
+  debt_repayment: [380]
+  replacement_income: [381]
+  child_education: [382]
+  final_expenses: [383]
+  other_considerations: [384]
+  assets: [386]
+  kiwisaver: [388]
+  total_cover: [389]
+
+needs_life_partner:
+  debt_repayment: [391]
+  replacement_income: [392]
+  child_education: [393]
+  final_expenses: [394]
+  other_considerations: [395]
+  assets: [397]
+  kiwisaver: [399]
+  total_cover: [400]
+  needs_analysis_notes: [504]
+
+# Needs Analysis - Trauma
+needs_trauma_main:
+  replacement_income: [402]
+  replacement_expenses: [486]
+  debt_repayment: [403]
+  medical_bills: [404]
+  childcare_assistance: [405]
+  buyback_option: [406]
+  tpd_addon: [407]
+  additional_child_trauma: [408]
+  total: [409]
+
+needs_trauma_partner:
+  replacement_income: [411]
+  replacement_expenses: [487]
+  debt_repayment: [412]
+  medical_bills: [413]
+  childcare_assistance: [414]
+  buyback_option: [415]
+  tpd_addon: [416]
+  additional_child_trauma: [417]
+  total: [418]
+  needs_analysis_notes: [506]
+
+# Needs Analysis - Income Protection
+needs_income_main:
+  monthly_mortgage: [420]
+  living_expenses: [421]
+  max_insurable_income: [422]
+  income_type: [423]
+  loe_mrc_type: [424]
+  acc_offsets: [425]
+  savings: [427]
+  leave_entitlements_dollars: [428]
+  leave_entitlements_weeks: [429]
+  wait_period_weeks: [430]
+  claim_period_years: [431]
+
+needs_income_partner:
+  mortgage_costs: [433]
+  living_expenses: [434]
+  max_income: [435]
+  income_type: [436]
+  loe_mrc_type: [437]
+  acc_offsets: [438]
+  savings: [440]
+  leave_entitlements_dollars: [441]
+  leave_entitlements_weeks: [442]
+  wait_period_weeks: [443]
+  claim_period_years: [444]
+  needs_analysis_notes: [508]
+
+# Needs Analysis - Accidental Injury
+needs_accident:
+  relevant_main_contact: [446]
+  relevant_partner: [447]
+
+# Needs Analysis - Medical Insurance
+needs_medical_main:
+  private_care_access: [449]
+  specialists_tests: [450]
+  non_pharmac: [451]
+  dental_optical_physio: [452]
+  child_coverage: [454]
+  base_excess: [453]
+
+needs_medical_partner:
+  private_care_access: [456]
+  specialists_tests: [457]
+  non_pharmac: [458]
+  dental_optical_physio: [459]
+  child_coverage: [461]
+  base_excess: [460]
+  needs_analysis_notes: [510]
+
+# Scope of Advice
+scope_of_advice:
+  scope_items: [520]  # Checkbox with sub-items
+  life_insurance: [520.1]
+  income_protection: [520.2]
+  trauma_cover: [520.3]
+  health_insurance: [520.4]
+  tpd: [520.5]
+  acc: [520.6]
+  limitation_reasons: [521]  # Checkbox with sub-items
+  limitation_employer_medical: [521.1]
+  limitation_no_debt: [521.2]
+  limitation_budget: [521.3]
+  limitation_self_insure: [521.4]
+  limitation_no_dependants: [521.5]
+  limitation_occupation: [521.6]
+  limitation_other: [521.7]
+  limitation_notes: [522]

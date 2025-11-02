@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "Insurance SOA Zapier Payload Schema",
+  "description": "Standardized payload structure for Zapier webhooks - ALWAYS use this exact structure",
+  "type": "object",
+  "required": [
+    "client_email",
+    "client_name",
+    "case_id",
+    "is_couple",
+    "scope_of_advice",
+    "personal_information",
+    "life_insurance",
+    "trauma_insurance",
+    "income_protection",
+    "health_insurance",
+    "accidental_injury"
+  ],
+  "properties": {
+    "client_email": {
+      "type": "string",
+      "description": "Primary client email address"
+    },
+    "client_name": {
+      "type": "string",
+      "description": "Full name of primary client"
+    },
+    "partner_name": {
+      "type": ["string", "null"],
+      "description": "Full name of partner (null if single)"
+    },
+    "case_id": {
+      "type": "string",
+      "description": "Case identifier"
+    },
+    "is_couple": {
+      "type": "boolean",
+      "description": "Whether this is a couple or single client"
+    },
+    "match_confidence": {
+      "type": "number",
+      "description": "Confidence score of form matching (0-1)"
+    },
+    "scope_of_advice": {
+      "type": "object",
+      "description": "Scope of advice section with products in/out of scope"
+    },
+    "personal_information": {
+      "type": "object",
+      "description": "Personal and employment information"
+    },
+    "assets_liabilities": {
+      "type": "object",
+      "description": "Financial assets and liabilities"
+    },
+    "life_insurance": {
+      "type": "object",
+      "description": "Life insurance needs and coverage"
+    },
+    "trauma_insurance": {
+      "type": "object",
+      "description": "Trauma insurance needs and coverage"
+    },
+    "income_protection": {
+      "type": "object",
+      "description": "Income protection needs and coverage"
+    },
+    "health_insurance": {
+      "type": "object",
+      "description": "Health insurance needs and coverage"
+    },
+    "accidental_injury": {
+      "type": "object",
+      "description": "Accidental injury / ACC top-up needs and coverage"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp when payload was generated"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source system identifier"
+    }
+  }
+}

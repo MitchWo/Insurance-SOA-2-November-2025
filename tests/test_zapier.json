@@ -1,0 +1,18 @@
+{
+  "client_name": "Mitch Worthington",
+  "is_couple": false,
+  "scope_life": true,
+  "scope_trauma": true,
+  "scope_income_protection": false,
+  "scope_tpd": false,
+  "scope_health": false,
+  "scope_acc": false,
+  "limitation_employer_medical": false,
+  "limitation_no_debt": false,
+  "limitation_budget": true,
+  "limitation_self_insure": false,
+  "limitation_no_dependants": true,
+  "limitation_uninsurable": false,
+  "limitation_other": false,
+  "limitation_notes": "Budget limitations and no dependants"
+}

@@ -1,0 +1,217 @@
+{
+  "section_type": "where_are_you_now",
+  "timestamp": "2025-10-27T16:21:56.177774",
+  "form_data": {
+    "personal_details": {
+      "main_first_name": "Sample Client",
+      "date_of_birth": "1985-01-01",
+      "main_occupation": "Manager",
+      "main_annual_income": 95000.0,
+      "will_epa_status": "Yes"
+    },
+    "assets": [
+      {
+        "name": "Savings",
+        "value": 30000.0
+      }
+    ],
+    "liabilities": [],
+    "kiwisaver_accounts": [
+      {
+        "provider": "Unknown Provider",
+        "balance": 55000.0
+      }
+    ],
+    "raw_fields": {
+      "field_144": "Sample Client",
+      "field_146": null,
+      "field_95": "1985-01-01",
+      "field_482": null,
+      "field_483": null,
+      "field_6": "Manager",
+      "field_40": null,
+      "field_277": null,
+      "field_297": null,
+      "field_10": "95000",
+      "field_42": null,
+      "field_501": "Yes",
+      "field_16": "650000",
+      "field_15": "400000",
+      "field_468": null,
+      "field_469": null,
+      "field_466": null,
+      "field_60": null,
+      "field_61": "55000",
+      "field_62": null,
+      "field_215": null,
+      "field_217": null,
+      "field_216": null,
+      "field_33": "Savings",
+      "field_26": "30000",
+      "field_34": null,
+      "field_28": null,
+      "field_211": null,
+      "field_210": null,
+      "field_35": null,
+      "field_50": null,
+      "field_36": null,
+      "field_51": null,
+      "field_37": null,
+      "field_52": null,
+      "field_38": null,
+      "field_53": null,
+      "field_206": null,
+      "field_207": null,
+      "field_208": null,
+      "field_209": null,
+      "field_212": null,
+      "field_213": null,
+      "field_214": null,
+      "field_220": null,
+      "field_221": null,
+      "field_222": null,
+      "field_223": null,
+      "field_224": null,
+      "field_225": null,
+      "field_226": null,
+      "field_227": null,
+      "field_71": null,
+      "field_72": null,
+      "field_73": null,
+      "field_74": null,
+      "field_75": null,
+      "field_77": null,
+      "field_78": null,
+      "field_88": null,
+      "field_89": null,
+      "field_90": null
+    }
+  },
+  "processed_data": {
+    "financial_summary": {
+      "total_assets": 735000.0,
+      "total_liabilities": 400000.0,
+      "net_worth": 335000.0,
+      "property_equity": 250000.0,
+      "total_income": 95000.0,
+      "debt_to_income_ratio": 421.1,
+      "kiwisaver_total": 55000.0
+    },
+    "personal_summary": {
+      "age": 40,
+      "is_couple": false,
+      "main_occupation": "Manager",
+      "main_employer": null,
+      "main_self_employed": null,
+      "partner_occupation": null,
+      "partner_employer": null,
+      "will_epa_status": "Yes"
+    },
+    "asset_breakdown": {
+      "property_value": 650000.0,
+      "investment_properties": 0.0,
+      "kiwisaver": 55000.0,
+      "other_assets": 30000.0
+    },
+    "liability_breakdown": {
+      "home_mortgage": 400000.0,
+      "investment_debt": 0.0,
+      "other_liabilities": 0
+    }
+  },
+  "prose_generation": {
+    "context": {
+      "client_name": "Sample Client",
+      "is_couple": false,
+      "pronoun": "they",
+      "possessive": "their",
+      "age_description": "mid-career",
+      "financial_position": "established financial position",
+      "income_level": "average income"
+    },
+    "required_sections": {
+      "personal_summary": {
+        "instruction": "Client age, occupation overview",
+        "max_length": 500,
+        "suggested_content": "Sample Client is 40 years old, working as Manager. They are seeking insurance advice to protect their financial position and secure their future."
+      },
+      "employment_status": {
+        "instruction": "Employment and income details",
+        "max_length": 600,
+        "suggested_content": "Primary income earner is employed by employer not specified with annual income of $95,000. Combined household income: $95,000."
+      },
+      "asset_summary": {
+        "instruction": "Overview of total assets and property",
+        "max_length": 600,
+        "suggested_content": "Total assets valued at $735,000. Primary residence valued at $650,000. Additional assets include 1 items: Savings ($30,000);"
+      },
+      "liability_summary": {
+        "instruction": "Overview of debts and obligations",
+        "max_length": 500,
+        "suggested_content": "Total liabilities of $400,000. Home mortgage: $400,000."
+      },
+      "net_worth_position": {
+        "instruction": "Net worth and financial strength",
+        "max_length": 400,
+        "suggested_content": "Net worth of $335,000 represents established financial position. Assets of $735,000 exceed liabilities of $400,000 with leverage ratio of 54.4%. This position provides good capacity for insurance premiums."
+      },
+      "kiwisaver_status": {
+        "instruction": "KiwiSaver holdings summary",
+        "max_length": 400,
+        "suggested_content": "KiwiSaver holdings total $55,000 across 1 account(s). Account 1: Unknown Provider ($55,000)."
+      },
+      "property_position": {
+        "instruction": "Property portfolio and equity",
+        "max_length": 500,
+        "suggested_content": "Total property equity of $250,000. Home valued at $650,000 with 61.5% LTV, providing $250,000 equity."
+      },
+      "estate_planning": {
+        "instruction": "Will and EPA status",
+        "max_length": 300,
+        "suggested_content": "Will and EPA documents are in place. Estate planning appears current. Regular review recommended to ensure alignment with insurance beneficiaries."
+      },
+      "key_observations": {
+        "instruction": "Notable financial aspects",
+        "max_length": 500,
+        "suggested_content": "Key observations: established financial position with net worth of $335,000; high debt-to-income ratio requires careful consideration."
+      },
+      "financial_capacity": {
+        "instruction": "Ability to handle premiums",
+        "max_length": 400,
+        "suggested_content": "With average income of $95,000 annually, and positive net worth of $335,000, client has capacity for insurance premiums in range of $396-$792 monthly. High debt levels suggest careful premium structuring needed."
+      }
+    }
+  },
+  "expected_response": {
+    "format": "structured_json",
+    "schema": "where_are_you_now_v1",
+    "fields": [
+      "personal_summary",
+      "employment_status",
+      "asset_summary",
+      "liability_summary",
+      "net_worth_position",
+      "kiwisaver_status",
+      "property_position",
+      "estate_planning",
+      "key_observations",
+      "financial_capacity"
+    ],
+    "validation_rules": {
+      "all_fields_required": true,
+      "max_lengths_enforced": true,
+      "character_limits": {
+        "personal_summary": 500,
+        "employment_status": 600,
+        "asset_summary": 600,
+        "liability_summary": 500,
+        "net_worth_position": 400,
+        "kiwisaver_status": 400,
+        "property_position": 500,
+        "estate_planning": 300,
+        "key_observations": 500,
+        "financial_capacity": 400
+      }
+    }
+  }
+}

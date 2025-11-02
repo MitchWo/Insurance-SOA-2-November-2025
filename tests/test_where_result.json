@@ -1,0 +1,241 @@
+{
+  "section_type": "where_are_you_now",
+  "timestamp": "2025-10-27T16:56:47.655469",
+  "form_data": {
+    "personal_details": {
+      "main_first_name": "John",
+      "partner_first_name": "Sarah",
+      "date_of_birth": "1985-03-15",
+      "main_self_employed": false,
+      "partner_self_employed": false,
+      "main_occupation": "Software Engineer",
+      "partner_occupation": "Marketing Manager",
+      "main_employer": "Tech Corp",
+      "partner_employer": "Marketing Agency",
+      "main_annual_income": 120000.0,
+      "partner_annual_income": 85000.0,
+      "will_epa_status": "Yes"
+    },
+    "assets": [
+      {
+        "name": "Savings",
+        "value": 25000.0
+      },
+      {
+        "name": "Shares",
+        "value": 15000.0
+      }
+    ],
+    "liabilities": [
+      {
+        "name": "Credit Card",
+        "value": 5000.0
+      },
+      {
+        "name": "Car Loan",
+        "value": 12000.0
+      }
+    ],
+    "kiwisaver_accounts": [
+      {
+        "provider": "ANZ",
+        "balance": 45000.0
+      },
+      {
+        "provider": "Westpac",
+        "balance": 32000.0
+      }
+    ],
+    "raw_fields": {
+      "field_144": "John",
+      "field_146": "Sarah",
+      "field_95": "1985-03-15",
+      "field_482": "No",
+      "field_483": "No",
+      "field_6": "Software Engineer",
+      "field_40": "Marketing Manager",
+      "field_277": "Tech Corp",
+      "field_297": "Marketing Agency",
+      "field_10": "120000",
+      "field_42": "85000",
+      "field_501": "Yes",
+      "field_16": "850000",
+      "field_15": "450000",
+      "field_468": "350000",
+      "field_469": "280000",
+      "field_466": null,
+      "field_60": "ANZ",
+      "field_61": "45000",
+      "field_62": "Westpac",
+      "field_215": "32000",
+      "field_217": null,
+      "field_216": null,
+      "field_33": "Savings",
+      "field_26": "25000",
+      "field_34": "Shares",
+      "field_28": "15000",
+      "field_211": null,
+      "field_210": null,
+      "field_35": null,
+      "field_50": null,
+      "field_36": null,
+      "field_51": null,
+      "field_37": null,
+      "field_52": null,
+      "field_38": null,
+      "field_53": null,
+      "field_206": null,
+      "field_207": null,
+      "field_208": null,
+      "field_209": null,
+      "field_212": null,
+      "field_213": null,
+      "field_214": null,
+      "field_220": null,
+      "field_221": null,
+      "field_222": null,
+      "field_223": null,
+      "field_224": null,
+      "field_225": null,
+      "field_226": null,
+      "field_227": null,
+      "field_71": "Credit Card",
+      "field_72": "5000",
+      "field_73": "Car Loan",
+      "field_74": "12000",
+      "field_75": null,
+      "field_77": null,
+      "field_78": null,
+      "field_88": null,
+      "field_89": null,
+      "field_90": null
+    }
+  },
+  "processed_data": {
+    "financial_summary": {
+      "total_assets": 1317000.0,
+      "total_liabilities": 747000.0,
+      "net_worth": 570000.0,
+      "property_equity": 470000.0,
+      "total_income": 205000.0,
+      "debt_to_income_ratio": 364.4,
+      "kiwisaver_total": 77000.0
+    },
+    "personal_summary": {
+      "age": 40,
+      "is_couple": true,
+      "main_occupation": "Software Engineer",
+      "main_employer": "Tech Corp",
+      "main_self_employed": false,
+      "partner_occupation": "Marketing Manager",
+      "partner_employer": "Marketing Agency",
+      "will_epa_status": "Yes"
+    },
+    "asset_breakdown": {
+      "property_value": 850000.0,
+      "investment_properties": 350000.0,
+      "kiwisaver": 77000.0,
+      "other_assets": 40000.0
+    },
+    "liability_breakdown": {
+      "home_mortgage": 450000.0,
+      "investment_debt": 280000.0,
+      "other_liabilities": 17000.0
+    }
+  },
+  "prose_generation": {
+    "context": {
+      "client_name": "John and Sarah Smith",
+      "is_couple": true,
+      "pronoun": "they",
+      "possessive": "their",
+      "age_description": "mid-career",
+      "financial_position": "strong financial position",
+      "income_level": "high income"
+    },
+    "required_sections": {
+      "personal_summary": {
+        "instruction": "Client age, occupation overview",
+        "max_length": 500,
+        "suggested_content": "John and Sarah Smith is 40 years old, working as Software Engineer. Partner works as Marketing Manager. This couple is seeking comprehensive insurance advice as part of their financial planning."
+      },
+      "employment_status": {
+        "instruction": "Employment and income details",
+        "max_length": 600,
+        "suggested_content": "Primary income earner is employed by Tech Corp with annual income of $120,000. Partner is employed by Marketing Agency earning $85,000 annually. Combined household income: $205,000."
+      },
+      "asset_summary": {
+        "instruction": "Overview of total assets and property",
+        "max_length": 600,
+        "suggested_content": "Total assets valued at $1,317,000. Primary residence valued at $850,000. Investment property portfolio worth $350,000. Additional assets include 2 items: Savings ($25,000); Shares ($15,000);"
+      },
+      "liability_summary": {
+        "instruction": "Overview of debts and obligations",
+        "max_length": 500,
+        "suggested_content": "Total liabilities of $747,000. Home mortgage: $450,000. Investment property debt: $280,000. Other debts total $17,000."
+      },
+      "net_worth_position": {
+        "instruction": "Net worth and financial strength",
+        "max_length": 400,
+        "suggested_content": "Net worth of $570,000 represents strong financial position. Assets of $1,317,000 exceed liabilities of $747,000 with leverage ratio of 56.7%. This position provides good capacity for insurance premiums."
+      },
+      "kiwisaver_status": {
+        "instruction": "KiwiSaver holdings summary",
+        "max_length": 400,
+        "suggested_content": "KiwiSaver holdings total $77,000 across 2 account(s). Account 1: ANZ ($45,000). Account 2: Westpac ($32,000)."
+      },
+      "property_position": {
+        "instruction": "Property portfolio and equity",
+        "max_length": 500,
+        "suggested_content": "Total property equity of $470,000. Home valued at $850,000 with 52.9% LTV, providing $400,000 equity. Investment properties: $350,000 value, $70,000 equity."
+      },
+      "estate_planning": {
+        "instruction": "Will and EPA status",
+        "max_length": 300,
+        "suggested_content": "Will and EPA documents are in place. Estate planning appears current. Regular review recommended to ensure alignment with insurance beneficiaries."
+      },
+      "key_observations": {
+        "instruction": "Notable financial aspects",
+        "max_length": 500,
+        "suggested_content": "Key observations: strong financial position with net worth of $570,000; high debt-to-income ratio requires careful consideration."
+      },
+      "financial_capacity": {
+        "instruction": "Ability to handle premiums",
+        "max_length": 400,
+        "suggested_content": "With high income of $205,000 annually, and positive net worth of $570,000, client has capacity for insurance premiums in range of $854-$1,708 monthly. High debt levels suggest careful premium structuring needed."
+      }
+    }
+  },
+  "expected_response": {
+    "format": "structured_json",
+    "schema": "where_are_you_now_v1",
+    "fields": [
+      "personal_summary",
+      "employment_status",
+      "asset_summary",
+      "liability_summary",
+      "net_worth_position",
+      "kiwisaver_status",
+      "property_position",
+      "estate_planning",
+      "key_observations",
+      "financial_capacity"
+    ],
+    "validation_rules": {
+      "all_fields_required": true,
+      "max_lengths_enforced": true,
+      "character_limits": {
+        "personal_summary": 500,
+        "employment_status": 600,
+        "asset_summary": 600,
+        "liability_summary": 500,
+        "net_worth_position": 400,
+        "kiwisaver_status": 400,
+        "property_position": 500,
+        "estate_planning": 300,
+        "key_observations": 500,
+        "financial_capacity": 400
+      }
+    }
+  }
+}

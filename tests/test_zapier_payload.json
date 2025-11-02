@@ -1,0 +1,51 @@
+{
+  "timestamp": "2025-10-27T16:56:47.655558",
+  "client_name": "John and Sarah Smith",
+  "is_couple": true,
+  "scope_of_advice": {
+    "in_scope_products": [
+      "Life Insurance",
+      "Income Protection",
+      "Total Permanent Disability (TPD)"
+    ],
+    "out_of_scope_products": [
+      "Trauma Cover",
+      "Health Insurance",
+      "ACC Top-Up"
+    ],
+    "has_limitations": true,
+    "sections": {
+      "summary": "This advice focuses on 3 insurance product(s) for Test Client: Life Insurance, Income Protection, Total Permanent Disability (TPD). The scope has been tailored based on specific needs, existing coverage, and identified circumstances that limit the requirement for certain insurance types.",
+      "in_scope": "The following insurance products are included in this advice: Life Insurance, Income Protection, Total Permanent Disability (TPD). Detailed recommendations and premium quotations for these products are provided in subsequent sections.",
+      "out_of_scope": "The following products are not included in this advice due to identified limitations: Trauma Cover, Health Insurance, ACC Top-Up. These exclusions are based on factors detailed in the limitations section.",
+      "limitations": "Scope limitations: Medical cover provided through employer; Budget constraints limit insurance options. Additional notes: Client has comprehensive health coverage through employer, budget allows for essential coverage only",
+      "assumptions": "This advice assumes: client requires protection for insurable risks identified; excluded products are not currently required or suitable; premiums quoted are estimates subject to underwriting; client's circumstances may change requiring review.",
+      "client_priorities": "Client priorities identified: protect family/beneficiaries from financial hardship; maintain income during disability; keep premiums within budget constraints",
+      "replacements": "Any replacement of existing policies will be clearly identified with detailed comparisons. Replacement is only recommended where new cover provides superior benefits or better value. Existing cover should be maintained until new cover is in place.",
+      "what_is_not_covered": "Not covered under this advice: private medical treatment costs. Clients should consider self-insurance or alternative arrangements for these risks.",
+      "next_steps": "Next steps: Review recommended products and premiums; Complete application forms for selected insurance; Undergo any required underwriting. Adviser will guide through application process.",
+      "disclosures": "This advice is based on information provided and current legislation. Insurance products have exclusions, limitations, and terms that affect coverage. Premiums may vary from quotes based on underwriting. Tax implications should be considered. Seek independent advice if uncertain."
+    }
+  },
+  "where_are_you_now": {
+    "net_worth": 570000.0,
+    "total_assets": 1317000.0,
+    "total_liabilities": 747000.0,
+    "total_income": 205000.0,
+    "sections": {
+      "personal_summary": "John and Sarah Smith is 40 years old, working as Software Engineer. Partner works as Marketing Manager. This couple is seeking comprehensive insurance advice as part of their financial planning.",
+      "employment_status": "Primary income earner is employed by Tech Corp with annual income of $120,000. Partner is employed by Marketing Agency earning $85,000 annually. Combined household income: $205,000.",
+      "asset_summary": "Total assets valued at $1,317,000. Primary residence valued at $850,000. Investment property portfolio worth $350,000. Additional assets include 2 items: Savings ($25,000); Shares ($15,000);",
+      "liability_summary": "Total liabilities of $747,000. Home mortgage: $450,000. Investment property debt: $280,000. Other debts total $17,000.",
+      "net_worth_position": "Net worth of $570,000 represents strong financial position. Assets of $1,317,000 exceed liabilities of $747,000 with leverage ratio of 56.7%. This position provides good capacity for insurance premiums.",
+      "kiwisaver_status": "KiwiSaver holdings total $77,000 across 2 account(s). Account 1: ANZ ($45,000). Account 2: Westpac ($32,000).",
+      "property_position": "Total property equity of $470,000. Home valued at $850,000 with 52.9% LTV, providing $400,000 equity. Investment properties: $350,000 value, $70,000 equity.",
+      "estate_planning": "Will and EPA documents are in place. Estate planning appears current. Regular review recommended to ensure alignment with insurance beneficiaries.",
+      "key_observations": "Key observations: strong financial position with net worth of $570,000; high debt-to-income ratio requires careful consideration.",
+      "financial_capacity": "With high income of $205,000 annually, and positive net worth of $570,000, client has capacity for insurance premiums in range of $854-$1,708 monthly. High debt levels suggest careful premium structuring needed."
+    }
+  },
+  "processing_status": "success",
+  "sections_generated": 20,
+  "ready_for_llm": true
+}

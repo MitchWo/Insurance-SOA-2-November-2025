@@ -1,0 +1,172 @@
+{
+  "section_type": "scope_of_advice",
+  "timestamp": "2025-10-27T15:33:33.785911",
+  "form_data": {
+    "scope_checkboxes": {
+      "Life Insurance": true,
+      "Income Protection": true,
+      "Trauma Cover": false,
+      "Health Insurance": false,
+      "Total Permanent Disability (TPD)": true,
+      "ACC Top-Up": false
+    },
+    "limitation_checkboxes": {
+      "employer_medical": true,
+      "no_debt_strong_assets": false,
+      "budget_limitations": true,
+      "self_insure": false,
+      "no_dependants": false,
+      "uninsurable_occupation": false,
+      "other": false
+    },
+    "limitation_notes": "Employer health plan covers family",
+    "raw_fields": {
+      "field_5": null,
+      "field_5_1": "Yes",
+      "field_5_2": "Yes",
+      "field_5_3": "No",
+      "field_5_4": "No",
+      "field_5_5": "Yes",
+      "field_5_6": "No",
+      "field_6": null,
+      "field_6_1": "Yes",
+      "field_6_2": null,
+      "field_6_3": "Yes",
+      "field_6_4": null,
+      "field_6_5": null,
+      "field_6_6": null,
+      "field_6_7": null,
+      "field_7": "Employer health plan covers family"
+    }
+  },
+  "processed_data": {
+    "in_scope": [
+      "Life Insurance",
+      "Income Protection",
+      "Total Permanent Disability (TPD)"
+    ],
+    "out_of_scope": [
+      "Trauma Cover",
+      "Health Insurance",
+      "ACC Top-Up"
+    ],
+    "active_limitations": [
+      {
+        "code": "employer_medical",
+        "description": "Medical cover provided through employer"
+      },
+      {
+        "code": "budget_limitations",
+        "description": "Budget constraints limit insurance options"
+      }
+    ],
+    "limitation_product_mapping": {
+      "employer_medical": [
+        "Health Insurance"
+      ],
+      "budget_limitations": [
+        "Trauma Cover",
+        "Health Insurance",
+        "ACC Top-Up"
+      ]
+    },
+    "has_limitations": true,
+    "all_products_in_scope": false,
+    "no_products_in_scope": false
+  },
+  "prose_generation": {
+    "context": {
+      "client_name": "Sample Client",
+      "is_couple": true,
+      "pronoun": "they",
+      "possessive": "their",
+      "total_products": 6,
+      "in_scope_count": 3,
+      "out_of_scope_count": 3
+    },
+    "required_sections": {
+      "summary": {
+        "instruction": "Brief overview of the advice scope based on client's needs and circumstances",
+        "max_length": 700,
+        "suggested_content": "This advice focuses on 3 insurance product(s) for Sample Client: Life Insurance, Income Protection, Total Permanent Disability (TPD). The scope has been tailored based on specific needs, existing coverage, and identified circumstances that limit the requirement for certain insurance types."
+      },
+      "in_scope": {
+        "instruction": "List products and services being advised on",
+        "max_length": 500,
+        "suggested_content": "The following insurance products are included in this advice: Life Insurance, Income Protection, Total Permanent Disability (TPD). Detailed recommendations and premium quotations for these products are provided in subsequent sections."
+      },
+      "out_of_scope": {
+        "instruction": "List products not being advised on with clear reasons",
+        "max_length": 500,
+        "suggested_content": "The following products are not included in this advice due to identified limitations: Trauma Cover, Health Insurance, ACC Top-Up. These exclusions are based on factors detailed in the limitations section."
+      },
+      "limitations": {
+        "instruction": "Scope limitations and boundaries based on client factors",
+        "max_length": 500,
+        "suggested_content": "Scope limitations: Medical cover provided through employer; Budget constraints limit insurance options. Additional notes: Employer health plan covers family"
+      },
+      "assumptions": {
+        "instruction": "Key assumptions made in determining scope",
+        "max_length": 500,
+        "suggested_content": "This advice assumes: client requires protection for insurable risks identified; excluded products are not currently required or suitable; both partners' insurance needs have been considered jointly; premiums quoted are estimates subject to underwriting; client's circumstances may change requiring review."
+      },
+      "client_priorities": {
+        "instruction": "Client's stated priorities and objectives",
+        "max_length": 500,
+        "suggested_content": "Client priorities identified: protect family/beneficiaries from financial hardship; maintain income during disability; keep premiums within budget constraints"
+      },
+      "replacements": {
+        "instruction": "Any advice on replacing existing products",
+        "max_length": 500,
+        "suggested_content": "Any replacement of existing policies will be clearly identified with detailed comparisons. Replacement is only recommended where new cover provides superior benefits or better value. Existing cover should be maintained until new cover is in place."
+      },
+      "what_is_not_covered": {
+        "instruction": "Explicit exclusions and what is not covered",
+        "max_length": 500,
+        "suggested_content": "Not covered under this advice: private medical treatment costs. Clients should consider self-insurance or alternative arrangements for these risks."
+      },
+      "next_steps": {
+        "instruction": "Immediate next actions for client and adviser",
+        "max_length": 400,
+        "suggested_content": "Next steps: Review recommended products and premiums; Complete application forms for selected insurance; Undergo any required underwriting. Adviser will guide through application process."
+      },
+      "disclosures": {
+        "instruction": "Required regulatory disclosures and important notes",
+        "max_length": 500,
+        "suggested_content": "This advice is based on information provided and current legislation. Insurance products have exclusions, limitations, and terms that affect coverage. Premiums may vary from quotes based on underwriting. Tax implications should be considered. Seek independent advice if uncertain."
+      }
+    }
+  },
+  "expected_response": {
+    "format": "structured_json",
+    "schema": "scope_section_v1",
+    "fields": [
+      "summary",
+      "in_scope",
+      "out_of_scope",
+      "limitations",
+      "assumptions",
+      "client_priorities",
+      "replacements",
+      "what_is_not_covered",
+      "next_steps",
+      "disclosures"
+    ],
+    "validation_rules": {
+      "all_fields_required": true,
+      "max_lengths_enforced": true,
+      "character_limits": {
+        "summary": 700,
+        "in_scope": 500,
+        "out_of_scope": 500,
+        "limitations": 500,
+        "assumptions": 500,
+        "client_priorities": 500,
+        "replacements": 500,
+        "what_is_not_covered": 500,
+        "next_steps": 400,
+        "disclosures": 500
+      }
+    }
+  }
+}
