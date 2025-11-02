@@ -1,10 +1,11 @@
 """
 Assets and Liabilities Extractor
 Extracts assets and liabilities in simple table format for Zapier consumption
-Direct data extraction without prose generation
+Direct data extraction without prose generation - MVP ready with clean numeric types
 """
 
 from typing import Dict, Any, List, Optional
+import json
 
 
 def extract_assets_liabilities(combined_data: Dict[str, Any]) -> Dict[str, Any]:
@@ -23,18 +24,20 @@ def extract_assets_liabilities(combined_data: Dict[str, Any]) -> Dict[str, Any]:
         """Safely get a field value with a default"""
         return data.get(field, default) if data else default
 
-    def parse_currency(value: Any) -> float:
-        """Convert string currency to number, return 0 if empty"""
-        if not value:
-            return 0.0
+    def parse_currency(value: Any) -> int:
+        """Convert string currency to integer, clamp negatives to 0"""
+        if not value or value == "":
+            return 0
         if isinstance(value, (int, float)):
-            return float(value)
-        # Remove $, commas, and convert to float
+            n = int(value)
+            return n if n > 0 else 0
+        # Remove $, commas, and convert to int
         cleaned = str(value).replace('$', '').replace(',', '').strip()
         try:
-            return float(cleaned)
+            n = int(float(cleaned))
+            return n if n > 0 else 0
         except:
-            return 0.0
+            return 0
 
     # Property assets - try multiple field variations
     property_assets = {
@@ -164,20 +167,55 @@ def extract_assets_liabilities(combined_data: Dict[str, Any]) -> Dict[str, Any]:
 
     net_worth = total_assets - total_liabilities
 
-    # Build the final structure - lean version for Zapier
-    return {
-        "section_type": "assets_liabilities",
-        "property_value": str(property_assets["current_house_value"]),
-        "property_address": property_assets["current_house_address"],
-        "property_mortgage": str(property_assets["current_mortgage"]),
-        "property_equity": str(property_assets["property_equity"]),
-        "kiwisaver_balance": str(total_kiwisaver),
-        "kiwisaver_count": len(kiwisaver_accounts),
-        "other_assets_value": str(total_other_assets),
-        "other_assets_count": len(other_assets),
-        "total_liabilities": str(total_liabilities),
-        "liability_count": len(liabilities),
-        "total_assets": str(total_assets),
-        "net_worth": str(net_worth),
-        "debt_to_asset_ratio": f"{(total_liabilities / total_assets * 100):.1f}" if total_assets > 0 else "0.0"
+    # Calculate debt-to-asset ratio
+    debt_to_asset_ratio = round((total_liabilities / total_assets * 100), 1) if total_assets > 0 else 0.0
+
+    # Build the final structure - MVP ready with clean numeric types and sections
+    result = {
+        "section_id": "assets_liabilities",
+        "status": "success",
+
+        # Summary (clean numeric types for easy consumption)
+        "total_assets": total_assets,
+        "total_liabilities": total_liabilities,
+        "net_worth": net_worth,
+        "debt_to_asset_ratio": debt_to_asset_ratio,
+
+        # Property section
+        "property": {
+            "value": property_assets["current_house_value"],
+            "address": property_assets["current_house_address"],
+            "mortgage": property_assets["current_mortgage"],
+            "mortgage_provider": property_assets["mortgage_provider"],
+            "equity": property_assets["property_equity"]
+        },
+
+        # KiwiSaver section
+        "kiwisaver": {
+            "total_balance": total_kiwisaver,
+            "account_count": len(kiwisaver_accounts),
+            "accounts": kiwisaver_accounts
+        },
+
+        # Other assets section
+        "other_assets": {
+            "total_value": total_other_assets,
+            "asset_count": len(other_assets),
+            "items": other_assets
+        },
+
+        # Liabilities section
+        "liabilities": {
+            "total_amount": total_liabilities,
+            "liability_count": len(liabilities),
+            "items": liabilities
+        },
+
+        # Metadata
+        "format": {
+            "currency": "NZD",
+            "locale": "en-NZ"
+        }
     }
+
+    return result

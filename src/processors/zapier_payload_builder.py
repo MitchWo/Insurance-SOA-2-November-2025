@@ -79,8 +79,13 @@ class ZapierPayloadBuilder:
                     "status": "not_generated",
                     "total_assets": 0,
                     "total_liabilities": 0,
-                    "net_position": 0
+                    "net_worth": 0
                 }
+            ),
+
+            # === ASSETS & LIABILITIES JSON (single field for Zapier mapping) ===
+            "assets_liabilities_json": self._build_assets_liabilities_json(
+                combined_report.get('assets_liabilities', {})
             ),
 
             # === LIFE INSURANCE ===
@@ -163,6 +168,26 @@ class ZapierPayloadBuilder:
             section_data['status'] = 'success'
 
         return section_data
+
+    def _build_assets_liabilities_json(self, assets_data: Dict[str, Any]) -> str:
+        """
+        Build a single JSON string field containing all assets & liabilities data
+        for easy Zapier mapping (one field instead of many nested objects)
+
+        Args:
+            assets_data: The assets_liabilities data from combined report
+
+        Returns:
+            JSON string containing all data, or empty object string if not generated
+        """
+        if not isinstance(assets_data, dict) or not assets_data:
+            return json.dumps({
+                "status": "not_generated",
+                "message": "Assets & liabilities data not yet generated"
+            })
+
+        # If data exists, return it as a JSON string
+        return json.dumps(assets_data, indent=2)
 
     def validate_payload(self, payload: Dict[str, Any]) -> tuple[bool, list]:
         """
