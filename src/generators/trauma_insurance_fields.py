@@ -1,6 +1,6 @@
 """
 Simplified Trauma Insurance Fields Extractor
-Returns clean individual field values for dynamic Zapier prompting
+Returns clean individual field values for dynamic Zapier prompting - MVP ready with int types
 """
 
 from typing import Dict, Any, Optional
@@ -18,8 +18,16 @@ def extract_trauma_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
     """
 
     # Helper to safely convert to float
-    def safe_float(value: Any, default: float = 0.0) -> float:
+    def safe_int(value: Any, default: int = 0) -> int:
+        """Convert to integer, clamp negatives to 0"""
         if value is None or value == '':
+            return default
+        try:
+            if isinstance(value, str):
+                value = value.replace(',', '').replace('$', '')
+            n = int(float(value))
+            return n if n > 0 else 0
+        except (ValueError, TypeError):
             return default
         try:
             if isinstance(value, str):
@@ -29,17 +37,17 @@ def extract_trauma_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
             return default
 
     # Extract main contact trauma needs
-    main_replacement_income = safe_float(form_data.get('402', 0))
-    main_replacement_expenses = safe_float(form_data.get('486', 0))
-    main_debt_repayment = safe_float(form_data.get('403', 0))
-    main_medical_bills = safe_float(form_data.get('404', 0))
-    main_childcare_assistance = safe_float(form_data.get('405', 0))
-    main_buyback_option = safe_float(form_data.get('406', 0))
-    main_tpd_addon = safe_float(form_data.get('407', 0))
-    main_additional_child_trauma = safe_float(form_data.get('408', 0))
+    main_replacement_income = safe_int(form_data.get('402', 0))
+    main_replacement_expenses = safe_int(form_data.get('486', 0))
+    main_debt_repayment = safe_int(form_data.get('403', 0))
+    main_medical_bills = safe_int(form_data.get('404', 0))
+    main_childcare_assistance = safe_int(form_data.get('405', 0))
+    main_buyback_option = safe_int(form_data.get('406', 0))
+    main_tpd_addon = safe_int(form_data.get('407', 0))
+    main_additional_child_trauma = safe_int(form_data.get('408', 0))
 
     # Calculate main total (or use provided total)
-    main_total_provided = safe_float(form_data.get('409', 0))
+    main_total_provided = safe_int(form_data.get('409', 0))
     main_total_calculated = (main_replacement_income + main_replacement_expenses +
                             main_debt_repayment + main_medical_bills +
                             main_childcare_assistance + main_buyback_option +
@@ -77,17 +85,17 @@ def extract_trauma_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
     # Add partner fields if couple
     if is_couple:
         # Extract partner trauma needs
-        partner_replacement_income = safe_float(form_data.get('411', 0))
-        partner_replacement_expenses = safe_float(form_data.get('487', 0))
-        partner_debt_repayment = safe_float(form_data.get('412', 0))
-        partner_medical_bills = safe_float(form_data.get('413', 0))
-        partner_childcare_assistance = safe_float(form_data.get('414', 0))
-        partner_buyback_option = safe_float(form_data.get('415', 0))
-        partner_tpd_addon = safe_float(form_data.get('416', 0))
-        partner_additional_child_trauma = safe_float(form_data.get('417', 0))
+        partner_replacement_income = safe_int(form_data.get('411', 0))
+        partner_replacement_expenses = safe_int(form_data.get('487', 0))
+        partner_debt_repayment = safe_int(form_data.get('412', 0))
+        partner_medical_bills = safe_int(form_data.get('413', 0))
+        partner_childcare_assistance = safe_int(form_data.get('414', 0))
+        partner_buyback_option = safe_int(form_data.get('415', 0))
+        partner_tpd_addon = safe_int(form_data.get('416', 0))
+        partner_additional_child_trauma = safe_int(form_data.get('417', 0))
 
         # Calculate partner total (or use provided total)
-        partner_total_provided = safe_float(form_data.get('418', 0))
+        partner_total_provided = safe_int(form_data.get('418', 0))
         partner_total_calculated = (partner_replacement_income + partner_replacement_expenses +
                                    partner_debt_repayment + partner_medical_bills +
                                    partner_childcare_assistance + partner_buyback_option +
@@ -148,6 +156,13 @@ def extract_trauma_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
     result['includes_childcare'] = main_childcare_assistance > 0
     result['includes_tpd_addon'] = main_tpd_addon > 0
     result['includes_child_trauma'] = main_additional_child_trauma > 0
+
+    # Add section metadata
+
+    result["section_id"] = "trauma_insurance"
+
+    result["status"] = "success"
+
 
     return result
 

@@ -1,6 +1,6 @@
 """
 Simplified Life Insurance Fields Extractor
-Returns clean individual field values for dynamic Zapier prompting
+Returns clean individual field values for dynamic Zapier prompting - MVP ready with clean int types
 """
 
 from typing import Dict, Any, Optional
@@ -14,30 +14,31 @@ def extract_life_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]:
         form_data: Raw form data with field IDs
 
     Returns:
-        Clean dictionary with individual field values for Zapier
+        Clean dictionary with individual field values for Zapier (integers for currency)
     """
 
-    # Helper to safely convert to float
-    def safe_float(value: Any, default: float = 0.0) -> float:
+    # Helper to safely convert to int (currency in whole NZD)
+    def safe_int(value: Any, default: int = 0) -> int:
         if value is None or value == '':
             return default
         try:
             if isinstance(value, str):
                 value = value.replace(',', '').replace('$', '')
-            return float(value)
+            n = int(float(value))
+            return n if n > 0 else 0
         except (ValueError, TypeError):
             return default
 
     # Extract main contact needs
-    main_debt_repayment = safe_float(form_data.get('380', 0))
-    main_replacement_income = safe_float(form_data.get('381', 0))
-    main_child_education = safe_float(form_data.get('382', 0))
-    main_final_expenses = safe_float(form_data.get('383', 0))
-    main_other_considerations = safe_float(form_data.get('384', 0))
+    main_debt_repayment = safe_int(form_data.get('380', 0))
+    main_replacement_income = safe_int(form_data.get('381', 0))
+    main_child_education = safe_int(form_data.get('382', 0))
+    main_final_expenses = safe_int(form_data.get('383', 0))
+    main_other_considerations = safe_int(form_data.get('384', 0))
 
     # Extract main contact offsets
-    main_assets = safe_float(form_data.get('386', 0))
-    main_kiwisaver = safe_float(form_data.get('388', 0))
+    main_assets = safe_int(form_data.get('386', 0))
+    main_kiwisaver = safe_int(form_data.get('388', 0))
 
     # Calculate main totals
     main_total_needs = (main_debt_repayment + main_replacement_income +
@@ -76,15 +77,15 @@ def extract_life_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]:
     # Add partner fields if couple
     if is_couple:
         # Extract partner needs
-        partner_debt_repayment = safe_float(form_data.get('391', 0))
-        partner_replacement_income = safe_float(form_data.get('392', 0))
-        partner_child_education = safe_float(form_data.get('393', 0))
-        partner_final_expenses = safe_float(form_data.get('394', 0))
-        partner_other_considerations = safe_float(form_data.get('395', 0))
+        partner_debt_repayment = safe_int(form_data.get('391', 0))
+        partner_replacement_income = safe_int(form_data.get('392', 0))
+        partner_child_education = safe_int(form_data.get('393', 0))
+        partner_final_expenses = safe_int(form_data.get('394', 0))
+        partner_other_considerations = safe_int(form_data.get('395', 0))
 
         # Extract partner offsets
-        partner_assets = safe_float(form_data.get('397', 0))
-        partner_kiwisaver = safe_float(form_data.get('399', 0))
+        partner_assets = safe_int(form_data.get('397', 0))
+        partner_kiwisaver = safe_int(form_data.get('399', 0))
 
         # Calculate partner totals
         partner_total_needs = (partner_debt_repayment + partner_replacement_income +
@@ -138,6 +139,10 @@ def extract_life_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]:
         result['coverage_level'] = "moderate"
     else:
         result['coverage_level'] = "comprehensive"
+
+    # Add section metadata for consistency
+    result['section_id'] = "life_insurance"
+    result['status'] = "success"
 
     return result
 

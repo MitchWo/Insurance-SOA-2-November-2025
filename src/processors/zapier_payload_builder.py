@@ -138,6 +138,13 @@ class ZapierPayloadBuilder:
                 }
             ),
 
+            # === INSURANCE JSON FIELDS (single field per section for easy Zapier mapping) ===
+            "life_insurance_json": self._build_section_json(combined_report.get('life_insurance', {})),
+            "trauma_insurance_json": self._build_section_json(combined_report.get('trauma_insurance', {})),
+            "income_protection_json": self._build_section_json(combined_report.get('income_protection', {})),
+            "health_insurance_json": self._build_section_json(combined_report.get('health_insurance', {})),
+            "accidental_injury_json": self._build_section_json(combined_report.get('accidental_injury', {})),
+
             # === METADATA ===
             "timestamp": datetime.now().isoformat(),
             "source": "Insurance-SOA-System",
@@ -188,6 +195,26 @@ class ZapierPayloadBuilder:
 
         # If data exists, return it as a JSON string
         return json.dumps(assets_data, indent=2)
+
+    def _build_section_json(self, section_data: Dict[str, Any]) -> str:
+        """
+        Build a single JSON string field for any insurance section
+        for easy Zapier mapping (one field instead of many nested objects)
+
+        Args:
+            section_data: The insurance section data from combined report
+
+        Returns:
+            JSON string containing all data, or empty object string if not generated
+        """
+        if not isinstance(section_data, dict) or not section_data:
+            return json.dumps({
+                "status": "not_generated",
+                "message": "Section data not yet generated"
+            })
+
+        # If data exists, return it as a JSON string
+        return json.dumps(section_data, indent=2)
 
     def validate_payload(self, payload: Dict[str, Any]) -> tuple[bool, list]:
         """

@@ -1,6 +1,6 @@
 """
 Simplified Accidental Injury Fields Extractor
-Returns clean individual field values for dynamic Zapier prompting
+Returns clean individual field values for dynamic Zapier prompting - MVP ready with int types
 """
 
 from typing import Dict, Any, Optional
@@ -108,6 +108,13 @@ def extract_accidental_injury_fields(form_data: Dict[str, Any]) -> Dict[str, Any
     result['needs_loss_of_income'] = main_relevant or result.get('partner_accident_relevant', False)
     result['needs_lump_sum_benefit'] = main_relevant or result.get('partner_accident_relevant', False)
     result['needs_rehabilitation_costs'] = main_relevant or result.get('partner_accident_relevant', False)
+
+    # Add section metadata
+
+    result["section_id"] = "accidental_injury"
+
+    result["status"] = "success"
+
 
     return result
 

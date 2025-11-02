@@ -1,6 +1,6 @@
 """
 Simplified Health Insurance Fields Extractor
-Returns clean individual field values for dynamic Zapier prompting
+Returns clean individual field values for dynamic Zapier prompting - MVP ready with int types
 """
 
 from typing import Dict, Any, Optional
@@ -18,8 +18,16 @@ def extract_health_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
     """
 
     # Helper to safely convert to float
-    def safe_float(value: Any, default: float = 0.0) -> float:
+    def safe_int(value: Any, default: int = 0) -> int:
+        """Convert to integer, clamp negatives to 0"""
         if value is None or value == '':
+            return default
+        try:
+            if isinstance(value, str):
+                value = value.replace(',', '').replace('$', '')
+            n = int(float(value))
+            return n if n > 0 else 0
+        except (ValueError, TypeError):
             return default
         try:
             if isinstance(value, str):
@@ -44,7 +52,7 @@ def extract_health_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
     main_non_pharmac = safe_bool(form_data.get('451', False))
     main_dental_optical_physio = safe_bool(form_data.get('452', False))
     main_child_coverage = safe_bool(form_data.get('454', False))
-    main_base_excess = safe_float(form_data.get('453', 0))
+    main_base_excess = safe_int(form_data.get('453', 0))
 
     # Count how many coverage types are needed
     main_coverage_count = sum([
@@ -112,7 +120,7 @@ def extract_health_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
         partner_non_pharmac = safe_bool(form_data.get('458', False))
         partner_dental_optical_physio = safe_bool(form_data.get('459', False))
         partner_child_coverage = safe_bool(form_data.get('461', False))
-        partner_base_excess = safe_float(form_data.get('460', 0))
+        partner_base_excess = safe_int(form_data.get('460', 0))
 
         # Count partner coverage types
         partner_coverage_count = sum([
@@ -213,6 +221,13 @@ def extract_health_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
         result['excess_preference'] = "moderate_excess"
     else:
         result['excess_preference'] = "high_excess"
+
+    # Add section metadata
+
+    result["section_id"] = "health_insurance"
+
+    result["status"] = "success"
+
 
     return result
 

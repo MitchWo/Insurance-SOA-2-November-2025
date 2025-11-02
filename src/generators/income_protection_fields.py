@@ -1,6 +1,6 @@
 """
 Simplified Income Protection Fields Extractor
-Returns clean individual field values for dynamic Zapier prompting
+Returns clean individual field values for dynamic Zapier prompting - MVP ready with int types
 """
 
 from typing import Dict, Any, Optional
@@ -18,8 +18,16 @@ def extract_income_protection_fields(form_data: Dict[str, Any]) -> Dict[str, Any
     """
 
     # Helper to safely convert to float
-    def safe_float(value: Any, default: float = 0.0) -> float:
+    def safe_int(value: Any, default: int = 0) -> int:
+        """Convert to integer, clamp negatives to 0"""
         if value is None or value == '':
+            return default
+        try:
+            if isinstance(value, str):
+                value = value.replace(',', '').replace('$', '')
+            n = int(float(value))
+            return n if n > 0 else 0
+        except (ValueError, TypeError):
             return default
         try:
             if isinstance(value, str):
@@ -40,14 +48,14 @@ def extract_income_protection_fields(form_data: Dict[str, Any]) -> Dict[str, Any
             return default
 
     # Extract main contact income protection needs
-    main_monthly_mortgage = safe_float(form_data.get('420', 0))
-    main_living_expenses = safe_float(form_data.get('421', 0))
-    main_max_insurable_income = safe_float(form_data.get('422', 0))
+    main_monthly_mortgage = safe_int(form_data.get('420', 0))
+    main_living_expenses = safe_int(form_data.get('421', 0))
+    main_max_insurable_income = safe_int(form_data.get('422', 0))
     main_income_type = form_data.get('423', '')
     main_loe_mrc_type = form_data.get('424', '')
-    main_acc_offsets = safe_float(form_data.get('425', 0))
-    main_savings = safe_float(form_data.get('427', 0))
-    main_leave_entitlements_dollars = safe_float(form_data.get('428', 0))
+    main_acc_offsets = safe_int(form_data.get('425', 0))
+    main_savings = safe_int(form_data.get('427', 0))
+    main_leave_entitlements_dollars = safe_int(form_data.get('428', 0))
     main_leave_entitlements_weeks = safe_int(form_data.get('429', 0))
     main_wait_period_weeks = safe_int(form_data.get('430', 0))
     main_claim_period_years = safe_int(form_data.get('431', 0))
@@ -99,14 +107,14 @@ def extract_income_protection_fields(form_data: Dict[str, Any]) -> Dict[str, Any
     # Add partner fields if couple
     if is_couple:
         # Extract partner income protection needs
-        partner_monthly_mortgage = safe_float(form_data.get('433', 0))
-        partner_living_expenses = safe_float(form_data.get('434', 0))
-        partner_max_insurable_income = safe_float(form_data.get('435', 0))
+        partner_monthly_mortgage = safe_int(form_data.get('433', 0))
+        partner_living_expenses = safe_int(form_data.get('434', 0))
+        partner_max_insurable_income = safe_int(form_data.get('435', 0))
         partner_income_type = form_data.get('436', '')
         partner_loe_mrc_type = form_data.get('437', '')
-        partner_acc_offsets = safe_float(form_data.get('438', 0))
-        partner_savings = safe_float(form_data.get('440', 0))
-        partner_leave_entitlements_dollars = safe_float(form_data.get('441', 0))
+        partner_acc_offsets = safe_int(form_data.get('438', 0))
+        partner_savings = safe_int(form_data.get('440', 0))
+        partner_leave_entitlements_dollars = safe_int(form_data.get('441', 0))
         partner_leave_entitlements_weeks = safe_int(form_data.get('442', 0))
         partner_wait_period_weeks = safe_int(form_data.get('443', 0))
         partner_claim_period_years = safe_int(form_data.get('444', 0))
@@ -204,6 +212,13 @@ def extract_income_protection_fields(form_data: Dict[str, Any]) -> Dict[str, Any
     result['has_acc_offsets'] = main_acc_offsets > 0
     result['has_leave_entitlements'] = main_leave_entitlements_dollars > 0 or main_leave_entitlements_weeks > 0
     result['has_savings_buffer'] = main_savings > 0
+
+    # Add section metadata
+
+    result["section_id"] = "income_protection"
+
+    result["status"] = "success"
+
 
     return result
 
