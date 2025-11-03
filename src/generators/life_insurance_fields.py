@@ -1,175 +1,266 @@
 """
-Simplified Life Insurance Fields Extractor
-Returns clean individual field values for dynamic Zapier prompting - MVP ready with clean int types
+Life Insurance Fields Extractor - Consolidated Version
+Groups all main and partner fields into single JSON strings for Zapier
+Omits zero values and maintains backward compatibility
 """
 
-from typing import Dict, Any, Optional
+import json
+from typing import Dict, Any
 
 
 def extract_life_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Extract and calculate life insurance fields from form data
+    Extract and consolidate life insurance fields for Zapier
 
-    Args:
-        form_data: Raw form data with field IDs
-
-    Returns:
-        Clean dictionary with individual field values for Zapier (integers for currency)
+    Returns grouped data instead of individual fields:
+    - life_insurance_main_json: All main person fields as JSON string
+    - life_insurance_partner_json: All partner fields as JSON string
+    - needs_analysis_notes: Separate text field
     """
 
-    # Helper to safely convert to int (currency in whole NZD)
     def safe_int(value: Any, default: int = 0) -> int:
-        if value is None or value == '':
+        """Convert to integer, handling currency strings"""
+        if not value or value == "":
             return default
         try:
             if isinstance(value, str):
-                value = value.replace(',', '').replace('$', '')
+                value = value.replace(',', '').replace(', ', '').strip()
             n = int(float(value))
             return n if n > 0 else 0
         except (ValueError, TypeError):
             return default
 
-    # Extract main contact needs
-    main_debt_repayment = safe_int(form_data.get('380', 0))
-    main_replacement_income = safe_int(form_data.get('381', 0))
-    main_child_education = safe_int(form_data.get('382', 0))
-    main_final_expenses = safe_int(form_data.get('383', 0))
-    main_other_considerations = safe_int(form_data.get('384', 0))
-
-    # Extract main contact offsets
-    main_assets = safe_int(form_data.get('386', 0))
-    main_kiwisaver = safe_int(form_data.get('388', 0))
-
-    # Calculate main totals
-    main_total_needs = (main_debt_repayment + main_replacement_income +
-                       main_child_education + main_final_expenses +
-                       main_other_considerations)
-    main_total_offsets = main_assets + main_kiwisaver
-    main_net_coverage = max(0, main_total_needs - main_total_offsets)
+    def format_currency(value: int) -> str:
+        """Format as currency"""
+        return f"${value:,}" if value > 0 else "$0"
 
     # Determine if couple
     is_couple = form_data.get('is_couple', False) or form_data.get('39') == 'couple'
 
+    # Extract main person life insurance components
+    main_components = {}
+
+    # Only add non-zero values
+    debt_repayment = safe_int(form_data.get('380', 0))
+    if debt_repayment > 0:
+        main_components['debt_repayment'] = debt_repayment
+        main_components['debt_repayment_formatted'] = format_currency(debt_repayment)
+
+    replacement_income = safe_int(form_data.get('381', 0))
+    if replacement_income > 0:
+        main_components['replacement_income'] = replacement_income
+        main_components['replacement_income_formatted'] = format_currency(replacement_income)
+
+    child_education = safe_int(form_data.get('382', 0))
+    if child_education > 0:
+        main_components['child_education'] = child_education
+        main_components['child_education_formatted'] = format_currency(child_education)
+
+    final_expenses = safe_int(form_data.get('383', 0))
+    if final_expenses > 0:
+        main_components['final_expenses'] = final_expenses
+        main_components['final_expenses_formatted'] = format_currency(final_expenses)
+
+    other_considerations = safe_int(form_data.get('384', 0))
+    if other_considerations > 0:
+        main_components['other_considerations'] = other_considerations
+        main_components['other_considerations_formatted'] = format_currency(other_considerations)
+
+    # Assets (offsets)
+    assets_offset = safe_int(form_data.get('386', 0))
+    if assets_offset > 0:
+        main_components['assets_offset'] = assets_offset
+        main_components['assets_offset_formatted'] = format_currency(assets_offset)
+
+    kiwisaver_offset = safe_int(form_data.get('388', 0))
+    if kiwisaver_offset > 0:
+        main_components['kiwisaver_offset'] = kiwisaver_offset
+        main_components['kiwisaver_offset_formatted'] = format_currency(kiwisaver_offset)
+
+    # Total cover needed
+    total_cover = safe_int(form_data.get('389', 0))
+    if total_cover > 0:
+        main_components['total_cover_needed'] = total_cover
+        main_components['total_cover_formatted'] = format_currency(total_cover)
+
+    # Calculate totals
+    total_needs = sum([
+        main_components.get('debt_repayment', 0),
+        main_components.get('replacement_income', 0),
+        main_components.get('child_education', 0),
+        main_components.get('final_expenses', 0),
+        main_components.get('other_considerations', 0)
+    ])
+
+    total_offsets = sum([
+        main_components.get('assets_offset', 0),
+        main_components.get('kiwisaver_offset', 0)
+    ])
+
+    net_coverage = max(0, total_needs - total_offsets)
+
+    if total_needs > 0:
+        main_components['total_needs'] = total_needs
+        main_components['total_needs_formatted'] = format_currency(total_needs)
+
+    if total_offsets > 0:
+        main_components['total_offsets'] = total_offsets
+        main_components['total_offsets_formatted'] = format_currency(total_offsets)
+
+    if net_coverage > 0:
+        main_components['net_coverage_required'] = net_coverage
+        main_components['net_coverage_formatted'] = format_currency(net_coverage)
+
+    # Add summary flag
+    if main_components:
+        main_components['needs_life_insurance'] = True
+
+    # Extract partner components if couple
+    partner_components = {}
+
+    if is_couple:
+        partner_debt = safe_int(form_data.get('391', 0))
+        if partner_debt > 0:
+            partner_components['debt_repayment'] = partner_debt
+            partner_components['debt_repayment_formatted'] = format_currency(partner_debt)
+
+        partner_income = safe_int(form_data.get('392', 0))
+        if partner_income > 0:
+            partner_components['replacement_income'] = partner_income
+            partner_components['replacement_income_formatted'] = format_currency(partner_income)
+
+        partner_education = safe_int(form_data.get('393', 0))
+        if partner_education > 0:
+            partner_components['child_education'] = partner_education
+            partner_components['child_education_formatted'] = format_currency(partner_education)
+
+        partner_final = safe_int(form_data.get('394', 0))
+        if partner_final > 0:
+            partner_components['final_expenses'] = partner_final
+            partner_components['final_expenses_formatted'] = format_currency(partner_final)
+
+        partner_other = safe_int(form_data.get('395', 0))
+        if partner_other > 0:
+            partner_components['other_considerations'] = partner_other
+            partner_components['other_considerations_formatted'] = format_currency(partner_other)
+
+        partner_assets = safe_int(form_data.get('397', 0))
+        if partner_assets > 0:
+            partner_components['assets_offset'] = partner_assets
+            partner_components['assets_offset_formatted'] = format_currency(partner_assets)
+
+        partner_kiwisaver = safe_int(form_data.get('399', 0))
+        if partner_kiwisaver > 0:
+            partner_components['kiwisaver_offset'] = partner_kiwisaver
+            partner_components['kiwisaver_offset_formatted'] = format_currency(partner_kiwisaver)
+
+        partner_total = safe_int(form_data.get('400', 0))
+        if partner_total > 0:
+            partner_components['total_cover_needed'] = partner_total
+            partner_components['total_cover_formatted'] = format_currency(partner_total)
+
+        # Calculate partner totals
+        partner_total_needs = sum([
+            partner_components.get('debt_repayment', 0),
+            partner_components.get('replacement_income', 0),
+            partner_components.get('child_education', 0),
+            partner_components.get('final_expenses', 0),
+            partner_components.get('other_considerations', 0)
+        ])
+
+        partner_total_offsets = sum([
+            partner_components.get('assets_offset', 0),
+            partner_components.get('kiwisaver_offset', 0)
+        ])
+
+        partner_net = max(0, partner_total_needs - partner_total_offsets)
+
+        if partner_total_needs > 0:
+            partner_components['total_needs'] = partner_total_needs
+            partner_components['total_needs_formatted'] = format_currency(partner_total_needs)
+
+        if partner_total_offsets > 0:
+            partner_components['total_offsets'] = partner_total_offsets
+            partner_components['total_offsets_formatted'] = format_currency(partner_total_offsets)
+
+        if partner_net > 0:
+            partner_components['net_coverage_required'] = partner_net
+            partner_components['net_coverage_formatted'] = format_currency(partner_net)
+
+        if partner_components:
+            partner_components['needs_life_insurance'] = True
+
+    # Extract needs analysis notes
+    needs_notes = form_data.get('504', '').strip()
+
+    # Build consolidated response
     result = {
         # Client info
         "client_name": form_data.get('client_name', form_data.get('3', '')),
         "is_couple": is_couple,
 
-        # Main contact individual fields
-        "main_debt_repayment": main_debt_repayment,
-        "main_replacement_income": main_replacement_income,
-        "main_child_education": main_child_education,
-        "main_final_expenses": main_final_expenses,
-        "main_other_considerations": main_other_considerations,
-        "main_assets": main_assets,
-        "main_kiwisaver": main_kiwisaver,
+        # Consolidated JSON fields for Zapier (single data points)
+        "life_insurance_main_json": json.dumps(main_components) if main_components else "{}",
+        "life_insurance_partner_json": json.dumps(partner_components) if partner_components else "{}",
 
-        # Main contact calculated fields
-        "main_total_needs": main_total_needs,
-        "main_total_offsets": main_total_offsets,
-        "main_net_coverage": main_net_coverage,
-        "main_needs_insurance": main_net_coverage > 0,
+        # Separate needs analysis note
+        "needs_analysis_notes": needs_notes,
 
-        # Additional notes
-        "needs_analysis_notes": form_data.get('504', ''),
+        # Summary flags for logic
+        "main_needs_insurance": len(main_components) > 0,
+        "partner_needs_insurance": len(partner_components) > 0,
+
+        # Overall recommendation status
+        "recommendation_status": "no_coverage_needed",
+
+        # Section metadata
+        "section_id": "life_insurance",
+        "status": "success"
     }
 
-    # Add partner fields if couple
-    if is_couple:
-        # Extract partner needs
-        partner_debt_repayment = safe_int(form_data.get('391', 0))
-        partner_replacement_income = safe_int(form_data.get('392', 0))
-        partner_child_education = safe_int(form_data.get('393', 0))
-        partner_final_expenses = safe_int(form_data.get('394', 0))
-        partner_other_considerations = safe_int(form_data.get('395', 0))
+    # Determine recommendation status
+    if main_components and partner_components:
+        result['recommendation_status'] = "both_need_coverage"
+    elif main_components:
+        result['recommendation_status'] = "main_only_needs_coverage"
+    elif partner_components:
+        result['recommendation_status'] = "partner_only_needs_coverage"
 
-        # Extract partner offsets
-        partner_assets = safe_int(form_data.get('397', 0))
-        partner_kiwisaver = safe_int(form_data.get('399', 0))
+    # Add formatted text summaries for easy reading
+    def create_summary_text(components: Dict, label: str) -> str:
+        """Create readable text summary"""
+        if not components:
+            return f"{label}: No life insurance needed"
 
-        # Calculate partner totals
-        partner_total_needs = (partner_debt_repayment + partner_replacement_income +
-                              partner_child_education + partner_final_expenses +
-                              partner_other_considerations)
-        partner_total_offsets = partner_assets + partner_kiwisaver
-        partner_net_coverage = max(0, partner_total_needs - partner_total_offsets)
+        lines = [f"{label} Life Insurance Needs:"]
 
-        # Add partner fields to result
-        result.update({
-            # Partner individual fields
-            "partner_debt_repayment": partner_debt_repayment,
-            "partner_replacement_income": partner_replacement_income,
-            "partner_child_education": partner_child_education,
-            "partner_final_expenses": partner_final_expenses,
-            "partner_other_considerations": partner_other_considerations,
-            "partner_assets": partner_assets,
-            "partner_kiwisaver": partner_kiwisaver,
+        if 'debt_repayment' in components:
+            lines.append(f"  Debt Repayment: {components['debt_repayment_formatted']}")
+        if 'replacement_income' in components:
+            lines.append(f"  Income Replacement: {components['replacement_income_formatted']}")
+        if 'child_education' in components:
+            lines.append(f"  Child Education: {components['child_education_formatted']}")
+        if 'final_expenses' in components:
+            lines.append(f"  Final Expenses: {components['final_expenses_formatted']}")
+        if 'other_considerations' in components:
+            lines.append(f"  Other: {components['other_considerations_formatted']}")
 
-            # Partner calculated fields
-            "partner_total_needs": partner_total_needs,
-            "partner_total_offsets": partner_total_offsets,
-            "partner_net_coverage": partner_net_coverage,
-            "partner_needs_insurance": partner_net_coverage > 0,
+        if 'total_needs_formatted' in components:
+            lines.append(f"  Total Needs: {components['total_needs_formatted']}")
 
-            # Combined totals
-            "combined_net_coverage": main_net_coverage + partner_net_coverage,
-            "both_need_insurance": main_net_coverage > 0 and partner_net_coverage > 0,
-        })
+        if 'assets_offset' in components or 'kiwisaver_offset' in components:
+            lines.append("  Less Offsets:")
+            if 'assets_offset' in components:
+                lines.append(f"    Assets: {components['assets_offset_formatted']}")
+            if 'kiwisaver_offset' in components:
+                lines.append(f"    KiwiSaver: {components['kiwisaver_offset_formatted']}")
 
-    # Add recommendation summary fields
-    if is_couple:
-        if main_net_coverage > 0 and result.get('partner_net_coverage', 0) > 0:
-            result['recommendation_status'] = "both_need_coverage"
-        elif main_net_coverage > 0:
-            result['recommendation_status'] = "main_only_needs_coverage"
-        elif result.get('partner_net_coverage', 0) > 0:
-            result['recommendation_status'] = "partner_only_needs_coverage"
-        else:
-            result['recommendation_status'] = "no_coverage_needed"
-    else:
-        result['recommendation_status'] = "coverage_needed" if main_net_coverage > 0 else "no_coverage_needed"
+        if 'net_coverage_formatted' in components:
+            lines.append(f"  Net Coverage Required: {components['net_coverage_formatted']}")
 
-    # Add coverage level indicator
-    total_coverage = main_net_coverage + result.get('partner_net_coverage', 0)
-    if total_coverage == 0:
-        result['coverage_level'] = "none"
-    elif total_coverage < 250000:
-        result['coverage_level'] = "basic"
-    elif total_coverage < 750000:
-        result['coverage_level'] = "moderate"
-    else:
-        result['coverage_level'] = "comprehensive"
+        return "\n".join(lines)
 
-    # Add section metadata for consistency
-    result['section_id'] = "life_insurance"
-    result['status'] = "success"
+    result['main_summary_text'] = create_summary_text(main_components, "Main Person")
+    result['partner_summary_text'] = create_summary_text(partner_components, "Partner") if is_couple else ""
 
     return result
-
-
-if __name__ == "__main__":
-    # Test with sample data
-    import json
-
-    sample_data = {
-        "client_name": "John Smith",
-        "is_couple": True,
-        "380": "500000",  # Main debt
-        "381": "300000",  # Main income
-        "382": "100000",  # Main education
-        "383": "20000",   # Main final
-        "384": "50000",   # Main other
-        "386": "150000",  # Main assets
-        "388": "80000",   # Main KiwiSaver
-        "391": "500000",  # Partner debt
-        "392": "200000",  # Partner income
-        "393": "100000",  # Partner education
-        "394": "20000",   # Partner final
-        "395": "30000",   # Partner other
-        "397": "100000",  # Partner assets
-        "399": "60000",   # Partner KiwiSaver
-        "504": "Family with young children"
-    }
-
-    result = extract_life_insurance_fields(sample_data)
-    print(json.dumps(result, indent=2))
