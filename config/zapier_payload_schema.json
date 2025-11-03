@@ -69,6 +69,38 @@
       "type": "object",
       "description": "Accidental injury / ACC top-up needs and coverage"
     },
+    "assets_list": {
+      "type": "string",
+      "description": "JSON array of assets as string"
+    },
+    "liabilities_list": {
+      "type": "string",
+      "description": "JSON array of liabilities as string"
+    },
+    "assets_table": {
+      "type": "string",
+      "description": "Plain text table of assets"
+    },
+    "liabilities_table": {
+      "type": "string",
+      "description": "Plain text table of liabilities"
+    },
+    "financial_summary": {
+      "type": "string",
+      "description": "Plain text financial summary with totals"
+    },
+    "total_assets": {
+      "type": "number",
+      "description": "Total assets value"
+    },
+    "total_liabilities": {
+      "type": "number",
+      "description": "Total liabilities value"
+    },
+    "net_worth": {
+      "type": "number",
+      "description": "Net worth (assets - liabilities)"
+    },
     "timestamp": {
       "type": "string",
       "format": "date-time",

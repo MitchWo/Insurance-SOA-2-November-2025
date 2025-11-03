@@ -410,6 +410,35 @@ def generate_personal_information():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/generate/assets-liabilities', methods=['POST'])
+def generate_assets_liabilities():
+    """
+    Extract assets and liabilities as simple text tables and JSON arrays
+    """
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+
+        from processors.assets_liabilities_extractor import extract_assets_liabilities
+
+        result = extract_assets_liabilities(data)
+
+        print("=" * 70)
+        print("EXTRACTED ASSETS & LIABILITIES")
+        print("=" * 70)
+        print(f"Assets: {result['asset_count']} items")
+        print(f"Liabilities: {result['liability_count']} items")
+        print(f"Net Worth: ${result['net_worth']:,}")
+        print("=" * 70)
+
+        return jsonify(result), 200
+
+    except Exception as e:
+        print(f"✗ Error: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/generate/combined-report', methods=['POST'])
 def generate_combined_report():
     """
@@ -436,6 +465,10 @@ def generate_combined_report():
 
         # Extract personal information
         personal_info = extract_personal_information(data)
+
+        # Extract assets and liabilities
+        from processors.assets_liabilities_extractor import extract_assets_liabilities
+        assets_liabilities = extract_assets_liabilities(data)
 
         # Generate life insurance fields
         life_insurance_fields = extract_life_insurance_fields(data)
@@ -466,6 +499,7 @@ def generate_combined_report():
                 }
             },
             'personal_information': personal_info,
+            'assets_liabilities': assets_liabilities,
             'life_insurance': life_insurance_fields,
             'trauma_insurance': trauma_insurance_fields,
             'income_protection': income_protection_fields,

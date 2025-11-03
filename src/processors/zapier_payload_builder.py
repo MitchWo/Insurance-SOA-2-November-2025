@@ -61,6 +61,16 @@ class ZapierPayloadBuilder:
             "health_insurance_json": self._build_section_json(combined_report.get('health_insurance', {})),
             "accidental_injury_json": self._build_section_json(combined_report.get('accidental_injury', {})),
 
+            # === ASSETS & LIABILITIES (simple string fields) ===
+            "assets_list": combined_report.get('assets_liabilities', {}).get('assets_json', '[]'),
+            "liabilities_list": combined_report.get('assets_liabilities', {}).get('liabilities_json', '[]'),
+            "assets_table": combined_report.get('assets_liabilities', {}).get('assets_text', ''),
+            "liabilities_table": combined_report.get('assets_liabilities', {}).get('liabilities_text', ''),
+            "financial_summary": combined_report.get('assets_liabilities', {}).get('summary_text', ''),
+            "total_assets": combined_report.get('assets_liabilities', {}).get('total_assets', 0),
+            "total_liabilities": combined_report.get('assets_liabilities', {}).get('total_liabilities', 0),
+            "net_worth": combined_report.get('assets_liabilities', {}).get('net_worth', 0),
+
             # === METADATA ===
             "timestamp": datetime.now().isoformat(),
             "source": "Insurance-SOA-System",
