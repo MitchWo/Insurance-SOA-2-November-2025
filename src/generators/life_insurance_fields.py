@@ -16,7 +16,7 @@ def extract_life_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]:
             return default
         try:
             if isinstance(value, str):
-                value = value.replace(',', '').replace(', '').strip()
+                value = value.replace(',', '').replace(', ', '').strip()
             n = int(float(value))
             return n if n > 0 else 0
         except (ValueError, TypeError):
