@@ -61,8 +61,12 @@ class ZapierPayloadBuilder:
             "life_insurance_partner": combined_report.get('life_insurance', {}).get('life_insurance_partner', ''),
             "life_insurance_notes": combined_report.get('life_insurance', {}).get('life_insurance_notes', ''),
 
+            # === TRAUMA INSURANCE (consolidated fields) ===
+            "trauma_insurance_main": combined_report.get('trauma_insurance', {}).get('trauma_insurance_main', ''),
+            "trauma_insurance_partner": combined_report.get('trauma_insurance', {}).get('trauma_insurance_partner', ''),
+            "trauma_insurance_notes": combined_report.get('trauma_insurance', {}).get('trauma_insurance_notes', ''),
+
             # === OTHER INSURANCE SECTIONS ===
-            "trauma_insurance_json": self._build_section_json(combined_report.get('trauma_insurance', {})),
             "income_protection_json": self._build_section_json(combined_report.get('income_protection', {})),
             "health_insurance_json": self._build_section_json(combined_report.get('health_insurance', {})),
             "accidental_injury_json": self._build_section_json(combined_report.get('accidental_injury', {})),
