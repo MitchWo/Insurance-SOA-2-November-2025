@@ -92,7 +92,41 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
 
         # Determine client info
         client_name = combined_data.get('client_name', combined_data.get('3', 'the client'))
-        is_couple = combined_data.get('is_couple', False) or combined_data.get('39') == 'couple'
+
+        # Enhanced couple detection - check multiple fields
+        is_couple = False
+
+        # Check automation form field 39 (couple status field)
+        field_39 = combined_data.get('39', combined_data.get('f39', ''))
+        if field_39:
+            field_39_lower = str(field_39).lower()
+            if 'couple' in field_39_lower or 'partner' in field_39_lower:
+                is_couple = True
+                print(f"✓ Detected couple from field 39: {field_39}")
+
+        # Check fact find field 8 (relationship status)
+        field_8 = combined_data.get('8', combined_data.get('f8', ''))
+        if field_8:
+            field_8_lower = str(field_8).lower()
+            if 'couple' in field_8_lower or 'partner' in field_8_lower or 'married' in field_8_lower:
+                is_couple = True
+                print(f"✓ Detected couple from field 8: {field_8}")
+
+        # Check for partner name fields (146, 147)
+        partner_first = combined_data.get('146', combined_data.get('f146', ''))
+        partner_last = combined_data.get('147', combined_data.get('f147', ''))
+        if partner_first or partner_last:
+            is_couple = True
+            print(f"✓ Detected couple from partner name fields: {partner_first} {partner_last}")
+
+        # Check explicit is_couple flag
+        if combined_data.get('is_couple') in [True, 'true', 'True', '1', 1]:
+            is_couple = True
+            print(f"✓ Detected couple from is_couple flag")
+
+        print(f"\n{'='*50}")
+        print(f"FINAL COUPLE STATUS: {is_couple}")
+        print(f"{'='*50}\n")
 
         # Generate all sections
         life_insurance = extract_life_insurance_fields(combined_data)

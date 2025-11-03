@@ -57,8 +57,34 @@ def extract_trauma_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]
     print(f"  Field 409 (Main Total): {form_data.get('409', 'NOT FOUND')}")
     print(f"  Field 506 (Notes): {form_data.get('506', 'NOT FOUND')[:50] if form_data.get('506') else 'NOT FOUND'}")
 
-    # Determine if couple
-    is_couple = form_data.get('is_couple', False) or form_data.get('39') == 'couple'
+    # Enhanced couple detection - check multiple fields
+    is_couple = False
+
+    # Check automation form field 39 (couple status field)
+    field_39 = form_data.get('39', form_data.get('f39', ''))
+    if field_39:
+        field_39_lower = str(field_39).lower()
+        if 'couple' in field_39_lower or 'partner' in field_39_lower:
+            is_couple = True
+
+    # Check fact find field 8 (relationship status)
+    field_8 = form_data.get('8', form_data.get('f8', ''))
+    if field_8:
+        field_8_lower = str(field_8).lower()
+        if 'couple' in field_8_lower or 'partner' in field_8_lower or 'married' in field_8_lower:
+            is_couple = True
+
+    # Check for partner name fields (146, 147)
+    partner_first = form_data.get('146', form_data.get('f146', ''))
+    partner_last = form_data.get('147', form_data.get('f147', ''))
+    if partner_first or partner_last:
+        is_couple = True
+
+    # Check explicit is_couple flag
+    if form_data.get('is_couple') in [True, 'true', 'True', '1', 1]:
+        is_couple = True
+
+    print(f"\n==> Trauma Insurance Couple Detection: {is_couple}")
 
     # Build main person text block
     main_lines = []
