@@ -54,7 +54,9 @@ class ZapierPayloadBuilder:
 
             # === JSON STRING FIELDS (one field per section - no nested objects!) ===
             "scope_of_advice_json": self._build_section_json(combined_report.get('scope_of_advice', {})),
-            "personal_information_json": self._build_section_json(combined_report.get('personal_information', {})),
+
+            # === PERSONAL INFORMATION (text format) ===
+            "personal_information": combined_report.get('personal_information', {}).get('personal_information_text', 'No personal information available'),
 
             # === LIFE INSURANCE (consolidated fields) ===
             "life_insurance_main": combined_report.get('life_insurance', {}).get('life_insurance_main', ''),
