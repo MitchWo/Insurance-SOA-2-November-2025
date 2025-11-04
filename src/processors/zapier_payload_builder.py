@@ -78,8 +78,10 @@ class ZapierPayloadBuilder:
             "health_insurance_partner": combined_report.get('health_insurance', {}).get('health_insurance_partner', ''),
             "health_insurance_notes": combined_report.get('health_insurance', {}).get('health_insurance_notes', ''),
 
-            # === OTHER INSURANCE SECTIONS ===
-            "accidental_injury_json": self._build_section_json(combined_report.get('accidental_injury', {})),
+            # === ACCIDENTAL INJURY (consolidated fields) ===
+            "accidental_injury_main": combined_report.get('accidental_injury', {}).get('accidental_injury_main', ''),
+            "accidental_injury_partner": combined_report.get('accidental_injury', {}).get('accidental_injury_partner', ''),
+            "accidental_injury_notes": combined_report.get('accidental_injury', {}).get('accidental_injury_notes', ''),
 
             # === ASSETS & LIABILITIES (simple string fields) ===
             "assets_list": combined_report.get('assets_liabilities', {}).get('assets_json', '[]'),
@@ -163,18 +165,25 @@ class ZapierPayloadBuilder:
             if field not in payload:
                 errors.append(f"Missing required field: {field}")
 
-        # Check required JSON fields
-        required_json_fields = [
-            'scope_of_advice_json', 'personal_information_json',
-            'life_insurance_json', 'trauma_insurance_json', 'income_protection_json',
-            'health_insurance_json', 'accidental_injury_json'
+        # Check required JSON field (only scope of advice remains as JSON)
+        if 'scope_of_advice_json' not in payload:
+            errors.append("Missing required field: scope_of_advice_json")
+        elif not isinstance(payload.get('scope_of_advice_json'), str):
+            errors.append("Field 'scope_of_advice_json' must be a JSON string")
+
+        # Check text fields exist (don't need to validate content - can be empty)
+        text_sections = [
+            'personal_information',
+            'life_insurance_main', 'life_insurance_partner', 'life_insurance_notes',
+            'trauma_insurance_main', 'trauma_insurance_partner', 'trauma_insurance_notes',
+            'income_protection_main', 'income_protection_partner', 'income_protection_notes',
+            'health_insurance_main', 'health_insurance_partner', 'health_insurance_notes',
+            'accidental_injury_main', 'accidental_injury_partner', 'accidental_injury_notes'
         ]
 
-        for field in required_json_fields:
+        for field in text_sections:
             if field not in payload:
-                errors.append(f"Missing required JSON field: {field}")
-            elif not isinstance(payload.get(field), str):
-                errors.append(f"Field '{field}' must be a JSON string")
+                errors.append(f"Missing text field: {field}")
 
         # Check types
         if 'is_couple' in payload and not isinstance(payload['is_couple'], bool):
@@ -187,7 +196,7 @@ class ZapierPayloadBuilder:
 
     def get_payload_summary(self, payload: Dict[str, Any]) -> str:
         """
-        Get a human-readable summary of the payload (JSON-field version)
+        Get a human-readable summary of the payload (text-based version)
 
         Args:
             payload: The payload to summarize
@@ -199,27 +208,43 @@ class ZapierPayloadBuilder:
             f"Client: {payload.get('client_name')} ({payload.get('client_email')})",
             f"Case ID: {payload.get('case_id')}",
             f"Couple: {'Yes' if payload.get('is_couple') else 'No'}",
-            f"JSON Fields included:"
+            f"",
+            f"Text Sections:"
         ]
 
-        json_sections = [
-            'scope_of_advice_json', 'personal_information_json',
-            'life_insurance_json', 'trauma_insurance_json', 'income_protection_json',
-            'health_insurance_json', 'accidental_injury_json'
+        # Check scope of advice (JSON)
+        scope_data = payload.get('scope_of_advice_json', '')
+        try:
+            scope_obj = json.loads(scope_data) if scope_data else {}
+            scope_status = scope_obj.get('status', 'present') if scope_obj else 'missing'
+        except:
+            scope_status = 'present' if scope_data else 'missing'
+        summary_lines.append(f"  - Scope of Advice: {scope_status} ({len(scope_data)} chars)")
+
+        # Check text sections
+        text_sections = [
+            ('Personal Information', 'personal_information'),
+            ('Life Insurance (Main)', 'life_insurance_main'),
+            ('Life Insurance (Partner)', 'life_insurance_partner'),
+            ('Life Insurance (Notes)', 'life_insurance_notes'),
+            ('Trauma Insurance (Main)', 'trauma_insurance_main'),
+            ('Trauma Insurance (Partner)', 'trauma_insurance_partner'),
+            ('Trauma Insurance (Notes)', 'trauma_insurance_notes'),
+            ('Income Protection (Main)', 'income_protection_main'),
+            ('Income Protection (Partner)', 'income_protection_partner'),
+            ('Income Protection (Notes)', 'income_protection_notes'),
+            ('Health Insurance (Main)', 'health_insurance_main'),
+            ('Health Insurance (Partner)', 'health_insurance_partner'),
+            ('Health Insurance (Notes)', 'health_insurance_notes'),
+            ('Accidental Injury (Main)', 'accidental_injury_main'),
+            ('Accidental Injury (Partner)', 'accidental_injury_partner'),
+            ('Accidental Injury (Notes)', 'accidental_injury_notes'),
         ]
 
-        for section in json_sections:
-            json_data = payload.get(section, '')
-            if json_data:
-                # Try to parse status from JSON
-                try:
-                    data = json.loads(json_data)
-                    status = data.get('status', 'present')
-                except:
-                    status = 'present'
-            else:
-                status = 'missing'
-            summary_lines.append(f"  - {section}: {status} ({len(json_data)} chars)")
+        for label, field in text_sections:
+            text_data = payload.get(field, '')
+            status = 'present' if text_data else 'empty'
+            summary_lines.append(f"  - {label}: {status} ({len(text_data)} chars)")
 
         return "\n".join(summary_lines)
 
