@@ -1,258 +1,230 @@
 """
-Simplified Health Insurance Fields Extractor
-Returns clean individual field values for dynamic Zapier prompting - MVP ready with int types
+Health Insurance Fields Extractor - Simplified Text Version
+Groups WordPress form fields into text blocks without calculations
 """
 
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 
 def extract_health_insurance_fields(form_data: Dict[str, Any]) -> Dict[str, Any]:
     """
-    Extract and calculate health insurance fields from form data
-
-    Args:
-        form_data: Raw form data with field IDs
-
-    Returns:
-        Clean dictionary with individual field values for Zapier
+    Extract health insurance fields as simple formatted text blocks
+    No calculations - just format existing field values
     """
 
-    # Helper to safely convert to float
     def safe_int(value: Any, default: int = 0) -> int:
-        """Convert to integer, clamp negatives to 0"""
-        if value is None or value == '':
+        """Convert to integer, handling currency strings"""
+        if not value or value == "":
             return default
         try:
             if isinstance(value, str):
-                value = value.replace(',', '').replace('$', '')
+                value = value.replace(',', '').replace(', ', '').strip()
             n = int(float(value))
             return n if n > 0 else 0
         except (ValueError, TypeError):
             return default
+
+    def format_currency(value: int) -> str:
+        """Format as currency"""
+        return f"${value:,}"
+
+    def get_field_value(field_id: str) -> Any:
+        """Try multiple field ID formats and return raw value"""
+        # Try direct numeric
+        val = form_data.get(field_id)
+        if val is not None and val != '':
+            return val
+        # Try with 'f' prefix
+        val = form_data.get(f'f{field_id}')
+        if val is not None and val != '':
+            return val
+        # Try as integer key
         try:
-            if isinstance(value, str):
-                value = value.replace(',', '').replace('$', '')
-            return float(value)
-        except (ValueError, TypeError):
-            return default
+            val = form_data.get(int(field_id))
+            if val is not None and val != '':
+                return val
+        except:
+            pass
+        return None
 
-    # Helper to safely convert to boolean
-    def safe_bool(value: Any, default: bool = False) -> bool:
-        if value is None or value == '':
-            return default
-        if isinstance(value, bool):
-            return value
-        if isinstance(value, str):
-            return value.lower() in ['true', 'yes', '1', 'y']
-        return bool(value)
+    def get_int_field(field_id: str) -> int:
+        """Get field value as integer"""
+        val = get_field_value(field_id)
+        return safe_int(val, 0)
 
-    # Extract main contact health insurance needs
-    main_private_care_access = safe_bool(form_data.get('449', False))
-    main_specialists_tests = safe_bool(form_data.get('450', False))
-    main_non_pharmac = safe_bool(form_data.get('451', False))
-    main_dental_optical_physio = safe_bool(form_data.get('452', False))
-    main_child_coverage = safe_bool(form_data.get('454', False))
-    main_base_excess = safe_int(form_data.get('453', 0))
+    def get_str_field(field_id: str) -> str:
+        """Get field value as string"""
+        val = get_field_value(field_id)
+        return str(val) if val else ""
 
-    # Count how many coverage types are needed
-    main_coverage_count = sum([
-        main_private_care_access,
-        main_specialists_tests,
-        main_non_pharmac,
-        main_dental_optical_physio,
-        main_child_coverage
-    ])
+    def format_yes_no(value: Any) -> str:
+        """Format boolean/yes-no field"""
+        if not value or value == '':
+            return "No"
+        val_str = str(value).lower()
+        if val_str in ['yes', 'true', '1', 'y']:
+            return "Yes"
+        return "No"
 
-    # Determine coverage level based on selections
-    if main_coverage_count == 0:
-        main_coverage_level = "none"
-    elif main_coverage_count <= 2:
-        main_coverage_level = "basic"
-    elif main_coverage_count <= 3:
-        main_coverage_level = "moderate"
-    else:
-        main_coverage_level = "comprehensive"
+    # Debug logging
+    print("=" * 50)
+    print("HEALTH INSURANCE FIELD EXTRACTION")
+    print("=" * 50)
+    print("Checking fields:")
+    print(f"  Field 449 (Main Private Care): {form_data.get('449', 'NOT FOUND')}")
+    print(f"  Field 453 (Main Base Excess): {form_data.get('453', 'NOT FOUND')}")
+    print(f"  Field 510 (Notes): {form_data.get('510', 'NOT FOUND')[:50] if form_data.get('510') else 'NOT FOUND'}")
 
-    # Determine plan type recommendation
-    if main_private_care_access and main_specialists_tests:
-        if main_non_pharmac and main_dental_optical_physio:
-            main_plan_type = "premium_plus"
-        else:
-            main_plan_type = "premium"
-    elif main_specialists_tests:
-        main_plan_type = "specialist"
-    elif main_private_care_access:
-        main_plan_type = "surgical"
-    else:
-        main_plan_type = "basic" if main_coverage_count > 0 else "none"
-
-    # Determine if couple
+    # Determine if couple (check partner fields for data)
     is_couple = form_data.get('is_couple', False) or form_data.get('39') == 'couple'
 
-    result = {
-        # Client info
+    # Also check if any partner health insurance fields have values
+    partner_field_ids = ['456', '457', '458', '459', '460', '461']
+    for field_id in partner_field_ids:
+        if get_field_value(field_id):
+            is_couple = True
+            print(f"  Detected couple due to partner field {field_id} having value")
+            break
+
+    print(f"Is Couple: {is_couple}")
+
+    # Build main person text block
+    main_lines = []
+    main_has_data = False
+
+    # Extract main person fields
+    fields_to_extract = [
+        ('Private Care Access', '449', 'yes_no'),
+        ('Specialists/Tests', '450', 'yes_no'),
+        ('Non-Pharmac Drugs', '451', 'yes_no'),
+        ('Dental/Optical/Physio', '452', 'yes_no'),
+        ('Base Excess', '453', 'currency'),
+        ('Child Coverage', '454', 'yes_no')
+    ]
+
+    # Build text for main person
+    for label, field_id, field_type in fields_to_extract:
+        if field_type == 'currency':
+            value = get_int_field(field_id)
+            if value > 0:
+                if not main_has_data:
+                    main_lines.append("MAIN PERSON HEALTH INSURANCE")
+                    main_lines.append("-" * 45)
+                    main_has_data = True
+                main_lines.append(f"{label:<25} {format_currency(value):>15}")
+        elif field_type == 'yes_no':
+            value = get_field_value(field_id)
+            formatted = format_yes_no(value)
+            if formatted == "Yes":  # Only show if Yes
+                if not main_has_data:
+                    main_lines.append("MAIN PERSON HEALTH INSURANCE")
+                    main_lines.append("-" * 45)
+                    main_has_data = True
+                main_lines.append(f"{label:<25} {formatted:>15}")
+        else:  # text
+            value = get_str_field(field_id)
+            if value:
+                if not main_has_data:
+                    main_lines.append("MAIN PERSON HEALTH INSURANCE")
+                    main_lines.append("-" * 45)
+                    main_has_data = True
+                main_lines.append(f"{label:<25} {value:>15}")
+
+    if main_has_data:
+        main_lines.append("-" * 45)
+
+    main_text = "\n".join(main_lines) if main_lines else "No health insurance data"
+
+    # Build partner text block
+    partner_text = ""
+    partner_lines = []
+    partner_has_data = False
+
+    if is_couple:
+        # Extract partner fields
+        partner_fields = [
+            ('Private Care Access', '456', 'yes_no'),
+            ('Specialists/Tests', '457', 'yes_no'),
+            ('Non-Pharmac Drugs', '458', 'yes_no'),
+            ('Dental/Optical/Physio', '459', 'yes_no'),
+            ('Base Excess', '460', 'currency'),
+            ('Child Coverage', '461', 'yes_no')
+        ]
+
+        # Build text for partner
+        for label, field_id, field_type in partner_fields:
+            if field_type == 'currency':
+                value = get_int_field(field_id)
+                if value > 0:
+                    if not partner_has_data:
+                        partner_lines.append("PARTNER HEALTH INSURANCE")
+                        partner_lines.append("-" * 45)
+                        partner_has_data = True
+                    partner_lines.append(f"{label:<25} {format_currency(value):>15}")
+            elif field_type == 'yes_no':
+                value = get_field_value(field_id)
+                formatted = format_yes_no(value)
+                if formatted == "Yes":  # Only show if Yes
+                    if not partner_has_data:
+                        partner_lines.append("PARTNER HEALTH INSURANCE")
+                        partner_lines.append("-" * 45)
+                        partner_has_data = True
+                    partner_lines.append(f"{label:<25} {formatted:>15}")
+            else:  # text
+                value = get_str_field(field_id)
+                if value:
+                    if not partner_has_data:
+                        partner_lines.append("PARTNER HEALTH INSURANCE")
+                        partner_lines.append("-" * 45)
+                        partner_has_data = True
+                    partner_lines.append(f"{label:<25} {value:>15}")
+
+        if partner_has_data:
+            partner_lines.append("-" * 45)
+
+        partner_text = "\n".join(partner_lines) if partner_lines else ""
+
+    # Extract needs analysis notes - try multiple field formats for field 510
+    needs_notes = ""
+    for field_id in ['510', 'f510', '510.0']:
+        notes = str(form_data.get(field_id, '')).strip()
+        if notes:
+            needs_notes = notes
+            break
+
+    if not needs_notes:
+        needs_notes = "No additional notes"
+
+    # Determine status based on presence of data
+    main_needs = main_has_data
+    partner_needs = partner_has_data
+
+    if main_needs and partner_needs:
+        status = "both_need_coverage"
+    elif main_needs:
+        status = "main_only_needs_coverage"
+    elif partner_needs:
+        status = "partner_only_needs_coverage"
+    else:
+        status = "no_coverage_needed"
+
+    print(f"Final outputs:")
+    print(f"  Main text: {len(main_text)} chars")
+    print(f"  Partner text: {len(partner_text)} chars")
+    print(f"  Notes: {len(needs_notes)} chars")
+    print("=" * 50)
+
+    return {
         "client_name": form_data.get('client_name', form_data.get('3', '')),
         "is_couple": is_couple,
 
-        # Main contact individual fields
-        "main_private_care_access": main_private_care_access,
-        "main_specialists_tests": main_specialists_tests,
-        "main_non_pharmac": main_non_pharmac,
-        "main_dental_optical_physio": main_dental_optical_physio,
-        "main_child_coverage": main_child_coverage,
-        "main_base_excess": main_base_excess,
+        # Three simple text fields for Zapier
+        "health_insurance_main": main_text,
+        "health_insurance_partner": partner_text,
+        "health_insurance_notes": needs_notes,
 
-        # Main contact calculated fields
-        "main_coverage_count": main_coverage_count,
-        "main_coverage_level": main_coverage_level,
-        "main_plan_type": main_plan_type,
-        "main_needs_health_insurance": main_coverage_count > 0,
-
-        # Additional notes
-        "health_insurance_notes": form_data.get('510', ''),
+        # Basic status
+        "health_insurance_recommendation_status": status,
+        "section_id": "health_insurance",
+        "status": "success"
     }
-
-    # Add partner fields if couple
-    if is_couple:
-        # Extract partner health insurance needs
-        partner_private_care_access = safe_bool(form_data.get('456', False))
-        partner_specialists_tests = safe_bool(form_data.get('457', False))
-        partner_non_pharmac = safe_bool(form_data.get('458', False))
-        partner_dental_optical_physio = safe_bool(form_data.get('459', False))
-        partner_child_coverage = safe_bool(form_data.get('461', False))
-        partner_base_excess = safe_int(form_data.get('460', 0))
-
-        # Count partner coverage types
-        partner_coverage_count = sum([
-            partner_private_care_access,
-            partner_specialists_tests,
-            partner_non_pharmac,
-            partner_dental_optical_physio,
-            partner_child_coverage
-        ])
-
-        # Determine partner coverage level
-        if partner_coverage_count == 0:
-            partner_coverage_level = "none"
-        elif partner_coverage_count <= 2:
-            partner_coverage_level = "basic"
-        elif partner_coverage_count <= 3:
-            partner_coverage_level = "moderate"
-        else:
-            partner_coverage_level = "comprehensive"
-
-        # Determine partner plan type
-        if partner_private_care_access and partner_specialists_tests:
-            if partner_non_pharmac and partner_dental_optical_physio:
-                partner_plan_type = "premium_plus"
-            else:
-                partner_plan_type = "premium"
-        elif partner_specialists_tests:
-            partner_plan_type = "specialist"
-        elif partner_private_care_access:
-            partner_plan_type = "surgical"
-        else:
-            partner_plan_type = "basic" if partner_coverage_count > 0 else "none"
-
-        # Add partner fields to result
-        result.update({
-            # Partner individual fields
-            "partner_private_care_access": partner_private_care_access,
-            "partner_specialists_tests": partner_specialists_tests,
-            "partner_non_pharmac": partner_non_pharmac,
-            "partner_dental_optical_physio": partner_dental_optical_physio,
-            "partner_child_coverage": partner_child_coverage,
-            "partner_base_excess": partner_base_excess,
-
-            # Partner calculated fields
-            "partner_coverage_count": partner_coverage_count,
-            "partner_coverage_level": partner_coverage_level,
-            "partner_plan_type": partner_plan_type,
-            "partner_needs_health_insurance": partner_coverage_count > 0,
-
-            # Combined analysis
-            "combined_coverage_count": main_coverage_count + partner_coverage_count,
-            "both_need_health_insurance": main_coverage_count > 0 and partner_coverage_count > 0,
-            "family_plan_recommended": (main_child_coverage or partner_child_coverage) and is_couple,
-        })
-
-    # Add recommendation summary fields
-    if is_couple:
-        if main_coverage_count > 0 and result.get('partner_coverage_count', 0) > 0:
-            result['health_insurance_recommendation_status'] = "both_need_coverage"
-        elif main_coverage_count > 0:
-            result['health_insurance_recommendation_status'] = "main_only_needs_coverage"
-        elif result.get('partner_coverage_count', 0) > 0:
-            result['health_insurance_recommendation_status'] = "partner_only_needs_coverage"
-        else:
-            result['health_insurance_recommendation_status'] = "no_coverage_needed"
-    else:
-        result['health_insurance_recommendation_status'] = "coverage_needed" if main_coverage_count > 0 else "no_coverage_needed"
-
-    # Add specific coverage flags for easy reference
-    result['needs_surgical_coverage'] = main_private_care_access or result.get('partner_private_care_access', False)
-    result['needs_specialist_coverage'] = main_specialists_tests or result.get('partner_specialists_tests', False)
-    result['needs_non_pharmac_coverage'] = main_non_pharmac or result.get('partner_non_pharmac', False)
-    result['needs_everyday_health'] = main_dental_optical_physio or result.get('partner_dental_optical_physio', False)
-    result['needs_child_coverage'] = main_child_coverage or result.get('partner_child_coverage', False)
-
-    # Determine overall plan recommendation
-    if result['needs_surgical_coverage'] and result['needs_specialist_coverage']:
-        if result['needs_non_pharmac_coverage'] and result['needs_everyday_health']:
-            result['recommended_plan_level'] = "premium_plus"
-        else:
-            result['recommended_plan_level'] = "premium"
-    elif result['needs_specialist_coverage']:
-        result['recommended_plan_level'] = "specialist"
-    elif result['needs_surgical_coverage']:
-        result['recommended_plan_level'] = "surgical"
-    elif main_coverage_count > 0 or result.get('partner_coverage_count', 0) > 0:
-        result['recommended_plan_level'] = "basic"
-    else:
-        result['recommended_plan_level'] = "none"
-
-    # Excess recommendation
-    total_excess = main_base_excess + result.get('partner_base_excess', 0)
-    if total_excess == 0:
-        result['excess_preference'] = "no_excess"
-    elif total_excess <= 500:
-        result['excess_preference'] = "low_excess"
-    elif total_excess <= 1000:
-        result['excess_preference'] = "moderate_excess"
-    else:
-        result['excess_preference'] = "high_excess"
-
-    # Add section metadata
-
-    result["section_id"] = "health_insurance"
-
-    result["status"] = "success"
-
-
-    return result
-
-
-if __name__ == "__main__":
-    # Test with sample data
-    import json
-
-    sample_data = {
-        "client_name": "John Smith",
-        "is_couple": True,
-        "449": "true",   # Main private care access
-        "450": "true",   # Main specialists tests
-        "451": "false",  # Main non-pharmac
-        "452": "true",   # Main dental/optical/physio
-        "453": "500",    # Main base excess
-        "454": "true",   # Main child coverage
-        "456": "true",   # Partner private care access
-        "457": "true",   # Partner specialists tests
-        "458": "true",   # Partner non-pharmac
-        "459": "false",  # Partner dental/optical/physio
-        "460": "250",    # Partner base excess
-        "461": "true",   # Partner child coverage
-        "510": "Family with young children, both working professionals"
-    }
-
-    result = extract_health_insurance_fields(sample_data)
-    print(json.dumps(result, indent=2))
