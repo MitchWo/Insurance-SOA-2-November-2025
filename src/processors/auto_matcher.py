@@ -31,7 +31,7 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
     # Check for match
     match_result = matcher.match_by_email(email)
 
-    if not match_result or not match_result.is_confident_match(threshold=0.7):
+    if not match_result or not match_result.is_confident_match(threshold=0.6):
         result['message'] = 'No confident match found yet'
         return result
 
