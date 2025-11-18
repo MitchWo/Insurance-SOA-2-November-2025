@@ -21,6 +21,15 @@ def safe_int(value: Any, default: int = 0) -> int:
         return default
 
 
+def get_first_valid_value(data: Dict[str, Any], field_list: list, default: Any = 0) -> Any:
+    """Get the first non-empty value from a list of field keys"""
+    for field in field_list:
+        value = data.get(field, '')
+        if value and str(value).strip() != '':
+            return value
+    return default
+
+
 def format_currency(value: int) -> str:
     """Format as currency"""
     return f"${value:,}"
@@ -41,11 +50,11 @@ def extract_assets_liabilities(combined_data: Dict[str, Any]) -> Dict[str, Any]:
     # Collect all assets
     assets = []
 
-    # Primary residence
-    house_value = safe_int(combined_data.get('16', 0))
+    # Owner occupied property - use helper to get first valid value
+    house_value = safe_int(get_first_valid_value(combined_data, ['16'], 0))
     if house_value > 0:
         assets.append({
-            "name": "Primary Residence",
+            "name": "Owner Occupied",
             "value": house_value,
             "formatted": format_currency(house_value)
         })
@@ -59,12 +68,47 @@ def extract_assets_liabilities(combined_data: Dict[str, Any]) -> Dict[str, Any]:
             "formatted": format_currency(investment_value)
         })
 
-    # General assets (1-15)
+    # General assets - Handle both documented patterns and edge cases
+
+    # Special case: Field 33 (not in original spec but contains data)
+    # This appears to be paired with field 26 based on Ryan's data
+    field_33_name = combined_data.get('33', '').strip()
+    field_26_value = safe_int(combined_data.get('26', 0))
+
+    # Check if field 22 is empty but field 26 has value (orphan value scenario)
+    field_22_name = combined_data.get('22', '').strip()
+
+    if field_33_name and field_26_value > 0 and not field_22_name:
+        # Field 33 is using the orphan value from field 26
+        assets.append({
+            "name": field_33_name,
+            "value": field_26_value,
+            "formatted": format_currency(field_26_value)
+        })
+    elif field_22_name and field_26_value > 0:
+        # Normal Asset 1 mapping (field 22/26)
+        assets.append({
+            "name": field_22_name,
+            "value": field_26_value,
+            "formatted": format_currency(field_26_value)
+        })
+
+    # Continue with remaining documented asset pairs
     asset_pairs = [
-        ('33', '26'), ('19', '36'), ('35', '34'), ('45', '46'),
-        ('47', '187'), ('186', '48'), ('198', '199'), ('189', '188'),
-        ('192', '193'), ('195', '196'), ('201', '202'), ('204', '205'),
-        ('207', '208'), ('210', '211'), ('213', '214')
+        ('19', '36'),   # Asset 2: Managed Funds - Foodstuffs (confirmed in data)
+        ('35', '34'),   # Asset 3
+        ('45', '46'),   # Asset 4
+        ('47', '287'),  # Asset 5
+        ('186', '48'),  # Asset 6
+        ('198', '199'), # Asset 7
+        ('189', '188'), # Asset 8
+        ('192', '193'), # Asset 9
+        ('195', '196'), # Asset 10
+        ('201', '202'), # Asset 11
+        ('204', '205'), # Asset 12
+        ('207', '20'),  # Asset 13
+        ('210', '211'), # Asset 14
+        ('213', '214')  # Asset 15
     ]
 
     for name_field, value_field in asset_pairs:
@@ -139,6 +183,9 @@ def extract_assets_liabilities(combined_data: Dict[str, Any]) -> Dict[str, Any]:
     total_liabilities = sum(l['value'] for l in liabilities)
     net_worth = total_assets - total_liabilities
 
+    # Get form-provided totals for validation (if available)
+    form_asset_total = safe_int(combined_data.get('466', 0))  # Asset Total field
+
     # Create simple text tables
     def create_text_table(items: List[Dict], title: str, total: int) -> str:
         """Create a simple text table"""
@@ -168,6 +215,11 @@ Total Liabilities:              {format_currency(total_liabilities):>15}
 --------------------------------------------------
 Net Worth:                      {format_currency(net_worth):>15}"""
 
+    # Add validation note if form total differs from calculated total
+    validation_note = ""
+    if form_asset_total > 0 and form_asset_total != total_assets:
+        validation_note = f"Note: Form asset total (${form_asset_total:,}) differs from calculated total (${total_assets:,})"
+
     # Return structured data
     return {
         "section_id": "assets_liabilities",
@@ -188,6 +240,10 @@ Net Worth:                      {format_currency(net_worth):>15}"""
         "net_worth": net_worth,
         "asset_count": len(assets),
         "liability_count": len(liabilities),
+
+        # Validation data
+        "form_asset_total": form_asset_total,
+        "validation_note": validation_note,
 
         "status": "success"
     }

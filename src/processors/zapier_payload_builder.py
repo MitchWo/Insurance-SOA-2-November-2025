@@ -93,6 +93,16 @@ class ZapierPayloadBuilder:
             "total_liabilities": combined_report.get('assets_liabilities', {}).get('total_liabilities', 0),
             "net_worth": combined_report.get('assets_liabilities', {}).get('net_worth', 0),
 
+            # === INSURANCE QUOTES (quote upload URLs) ===
+            "quote_partners_life": combined_report.get('insurance_quotes', {}).get('quote_partners_life', ''),
+            "quote_fidelity_life": combined_report.get('insurance_quotes', {}).get('quote_fidelity_life', ''),
+            "quote_aia": combined_report.get('insurance_quotes', {}).get('quote_aia', ''),
+            "quote_asteron": combined_report.get('insurance_quotes', {}).get('quote_asteron', ''),
+            "quote_chubb": combined_report.get('insurance_quotes', {}).get('quote_chubb', ''),
+            "quote_nib": combined_report.get('insurance_quotes', {}).get('quote_nib', ''),
+            "quotes_count": combined_report.get('insurance_quotes', {}).get('quotes_count', 0),
+            "has_quotes": combined_report.get('insurance_quotes', {}).get('has_quotes', False),
+
             # === METADATA ===
             "timestamp": datetime.now().isoformat(),
             "source": "Insurance-SOA-System",

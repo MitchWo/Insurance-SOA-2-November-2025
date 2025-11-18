@@ -50,7 +50,7 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
     combined_data = {}
     forms_dir = Path(__file__).parent.parent.parent / "data" / "forms"
 
-    # Try to load raw fact find data
+    # Try to load raw fact find data FIRST (base data)
     try:
         safe_email = email.replace('@', '_at_').replace('.', '_')
         fact_find_files = list((forms_dir / "fact_finds").glob(f"{safe_email}_*.json"))
@@ -65,19 +65,29 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
         if isinstance(fact_find_data, dict):
             combined_data.update(fact_find_data)
 
-    # Try to load raw automation form data
+    # Load automation form data but ONLY UPDATE NON-EMPTY VALUES
+    # This prevents automation form empty fields from overwriting fact find data
     try:
         automation_files = list((forms_dir / "automation_forms").glob(f"{safe_email}_*.json"))
         if automation_files:
             # Use the most recent file
             automation_files.sort(reverse=True)
             with open(automation_files[0]) as f:
-                combined_data.update(json.load(f))
+                automation_data = json.load(f)
+                # Only update with non-empty values
+                for key, value in automation_data.items():
+                    # Only update if value is not empty string, not None, and not False
+                    # But allow 0 as a valid value
+                    if value != "" and value is not None and value is not False:
+                        combined_data[key] = value
     except:
         # Fallback to model data
         automation_data = match_result.automation_form.to_dict() if hasattr(match_result.automation_form, 'to_dict') else match_result.automation_form
         if isinstance(automation_data, dict):
-            combined_data.update(automation_data)
+            # Only update with non-empty values
+            for key, value in automation_data.items():
+                if value != "" and value is not None and value is not False:
+                    combined_data[key] = value
 
     # Generate all insurance fields
     try:
@@ -89,6 +99,7 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
         from processors.scope_of_advice_generator import generate_scope_of_advice_json
         from processors.personal_information_extractor import extract_personal_information
         from processors.assets_liabilities_extractor import extract_assets_liabilities
+        from processors.insurance_quotes_extractor import extract_insurance_quotes
 
         # Determine client info
         client_name = combined_data.get('client_name', combined_data.get('3', 'the client'))
@@ -134,6 +145,7 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
         scope_result = generate_scope_of_advice_json(combined_data, client_name=client_name, is_couple=is_couple)
         personal_info = extract_personal_information(combined_data)
         assets_liabilities = extract_assets_liabilities(combined_data)
+        insurance_quotes = extract_insurance_quotes(combined_data)
 
         # Create combined report
         combined_report = {
@@ -145,13 +157,14 @@ def check_and_trigger_match(email: str, matcher, zapier_trigger) -> Dict[str, An
             'scope_of_advice': scope_result,
             'personal_information': personal_info,
             'assets_liabilities': assets_liabilities,
+            'insurance_quotes': insurance_quotes,
             'life_insurance': life_insurance,
             'trauma_insurance': trauma_insurance,
             'income_protection': income_protection,
             'health_insurance': health_insurance,
             'accidental_injury': accidental_injury,
             'validation': {
-                'total_sections_generated': 20,
+                'total_sections_generated': 21,
                 'all_sections_valid': True,
                 'includes_all_insurance_types': True
             }
